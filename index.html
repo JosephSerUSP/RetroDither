@@ -559,6 +559,17 @@
  * - Zoom Preferences
  */
 
+/**
+ * Global constants used throughout the application.
+ * @constant
+ * @type {Object}
+ * @property {number} LUMA_R - Red coefficient for luma calculation.
+ * @property {number} LUMA_G - Green coefficient for luma calculation.
+ * @property {number} LUMA_B - Blue coefficient for luma calculation.
+ * @property {number[]} RESOLUTION_STOPS - Pre-calculated resolution stops.
+ * @property {number[][]} BAYER4 - 4x4 Bayer matrix for ordered dithering.
+ * @property {number[][]} BAYER8 - 8x8 Bayer matrix for ordered dithering.
+ */
 const CONSTANTS = {
     LUMA_R: 0.299,
     LUMA_G: 0.587,
@@ -577,6 +588,12 @@ const CONSTANTS = {
     ]
 };
 
+/**
+ * Collection of color palettes.
+ * Each palette is an array of RGB arrays [r, g, b].
+ * @constant
+ * @type {Object.<string, number[][]>}
+ */
 const PALETTES = {
     'bw': [[0,0,0], [255,255,255]],
     'gb': [[15,56,15], [48,98,48], [139,172,15], [155,188,15]],
@@ -605,6 +622,10 @@ const PALETTES = {
     'matrix': [[0,0,0], [0,50,0], [0,100,0], [0,150,0], [0,200,0], [0,255,0], [200,255,200]]
 };
 
+/**
+ * Generates the standard VGA 256 color palette.
+ * @returns {number[][]} An array of 256 colors, each representing [r, g, b].
+ */
 const generateVGA = () => {
     const p = [
         [0,0,0], [0,0,170], [0,170,0], [0,170,170], [170,0,0], [170,0,170], [170,85,0], [170,170,170],
@@ -616,13 +637,38 @@ const generateVGA = () => {
 };
 PALETTES['vga'] = generateVGA();
 
+/**
+ * Utility class for color calculations and conversions.
+ */
 class ColorUtils {
+    /**
+     * Calculates the squared Euclidean distance between two colors.
+     * @param {number[]} c1 - First color [r, g, b].
+     * @param {number[]} c2 - Second color [r, g, b].
+     * @returns {number} The squared distance.
+     */
     static distEuclidean(c1, c2) { return (c1[0]-c2[0])**2 + (c1[1]-c2[1])**2 + (c1[2]-c2[2])**2; }
+
+    /**
+     * Calculates the Redmean color distance between two colors.
+     * This approximates human color perception better than Euclidean distance.
+     * @param {number[]} c1 - First color [r, g, b].
+     * @param {number[]} c2 - Second color [r, g, b].
+     * @returns {number} The weighted squared distance.
+     */
     static distRedmean(c1, c2) {
         let rMean = (c1[0] + c2[0]) / 2;
         let r = c1[0] - c2[0], g = c1[1] - c2[1], b = c1[2] - c2[2];
         return (((512+rMean)*r*r)>>8) + 4*g*g + (((767-rMean)*b*b)>>8);
     }
+
+    /**
+     * Converts RGB color space to HSV.
+     * @param {number} r - Red (0-255).
+     * @param {number} g - Green (0-255).
+     * @param {number} b - Blue (0-255).
+     * @returns {number[]} The HSV representation [h, s, v] where h, s, v are 0-1.
+     */
     static rgbToHsv(r, g, b) {
         r/=255, g/=255, b/=255;
         let max = Math.max(r,g,b), min = Math.min(r,g,b);
@@ -639,6 +685,14 @@ class ColorUtils {
         }
         return [h, s, v];
     }
+
+    /**
+     * Converts HSV color space to RGB.
+     * @param {number} h - Hue (0-1).
+     * @param {number} s - Saturation (0-1).
+     * @param {number} v - Value (0-1).
+     * @returns {number[]} The RGB representation [r, g, b] (0-255).
+     */
     static hsvToRgb(h, s, v) {
         let r, g, b, i = Math.floor(h*6), f=h*6-i, p=v*(1-s), q=v*(1-f*s), t=v*(1-(1-f)*s);
         switch (i%6) {
@@ -647,12 +701,35 @@ class ColorUtils {
         }
         return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
     }
+
+    /**
+     * Converts RGB color space to YIQ.
+     * @param {number} r - Red (0-255).
+     * @param {number} g - Green (0-255).
+     * @param {number} b - Blue (0-255).
+     * @returns {number[]} The YIQ representation [y, i, q].
+     */
     static rgbToYiq(r, g, b) {
         return [CONSTANTS.LUMA_R*r + CONSTANTS.LUMA_G*g + CONSTANTS.LUMA_B*b, 0.596*r - 0.274*g - 0.322*b, 0.211*r - 0.523*g - 0.312*b];
     }
+
+    /**
+     * Converts YIQ color space to RGB.
+     * @param {number} y - Luma component.
+     * @param {number} i - In-phase component.
+     * @param {number} q - Quadrature component.
+     * @returns {number[]} The RGB representation [r, g, b] (0-255).
+     */
     static yiqToRgb(y, i, q) {
         return [Math.max(0,Math.min(255, y+0.956*i+0.621*q)), Math.max(0,Math.min(255, y-0.272*i-0.647*q)), Math.max(0,Math.min(255, y-1.106*i+1.703*q))];
     }
+
+    /**
+     * Quantizes a value into a specific number of steps.
+     * @param {number} val - The value to quantize (0-255).
+     * @param {number} steps - The number of steps/levels.
+     * @returns {number} The quantized value.
+     */
     static quantizeVal(val, steps) {
         if (steps < 2) steps = 2;
         const stepSize = 255 / (steps - 1);
@@ -660,7 +737,24 @@ class ColorUtils {
     }
 }
 
+/**
+ * Collection of dithering strategies (error diffusion and ordered).
+ * @namespace
+ */
 const DitherStrategies = {
+    /**
+     * Helper to distribute quantization error to neighboring pixels.
+     * @param {Uint8ClampedArray} data - The image pixel data.
+     * @param {number} idx - Current pixel index.
+     * @param {number} w - Image width.
+     * @param {number} h - Image height.
+     * @param {number} dx - X offset for error distribution.
+     * @param {number} dy - Y offset for error distribution.
+     * @param {number} factor - Error distribution factor.
+     * @param {number} errR - Red error component.
+     * @param {number} errG - Green error component.
+     * @param {number} errB - Blue error component.
+     */
     _distribute: (data, idx, w, h, dx, dy, factor, errR, errG, errB) => {
         const targetIdx = idx + (dy * w + dx) * 4;
         if(targetIdx < data.length && targetIdx > 0) {
@@ -717,7 +811,13 @@ const DitherStrategies = {
     }
 };
 
+/**
+ * Handles image loading, processing, and pixel manipulation.
+ */
 class ImageProcessor {
+    /**
+     * Creates an instance of ImageProcessor.
+     */
     constructor() {
         this.srcCanvas = document.createElement('canvas');
         this.srcCtx = this.srcCanvas.getContext('2d');
@@ -725,6 +825,10 @@ class ImageProcessor {
         this.height = 0;
     }
 
+    /**
+     * Loads an image into the processor's source canvas.
+     * @param {HTMLImageElement} img - The source image element.
+     */
     loadImage(img) {
         this.width = img.width;
         this.height = img.height;
@@ -733,6 +837,16 @@ class ImageProcessor {
         this.srcCtx.drawImage(img, 0, 0);
     }
 
+    /**
+     * Finds the closest matching color in a palette.
+     * @param {number} r - Red component.
+     * @param {number} g - Green component.
+     * @param {number} b - Blue component.
+     * @param {number[][]} palette - Array of available colors.
+     * @param {boolean} useRedmean - Whether to use Redmean distance (true) or Euclidean (false).
+     * @param {Map} cache - Cache for color lookups.
+     * @returns {number[]} The closest matching color [r, g, b].
+     */
     findClosest(r, g, b, palette, useRedmean, cache) {
         const ri = Math.round(r), gi = Math.round(g), bi = Math.round(b);
         const key = (ri << 16) | (gi << 8) | bi;
@@ -746,6 +860,13 @@ class ImageProcessor {
         return best;
     }
 
+    /**
+     * Processes the loaded image with the given options.
+     * Uses a generator to allow non-blocking processing (chunking).
+     * @param {Object} options - Processing configuration (resolution, palette, dithering, etc.).
+     * @param {function} onProgress - Callback for progress updates (0-1).
+     * @param {function} onComplete - Callback with the final ImageData.
+     */
     async process(options, onProgress, onComplete) {
         const { targetWidth, contrast, brightness, saturation, ditherType1, ditherType2, ditherMix, ditherAmt, paletteId, axis1, axis2, axis3, useRedmean } = options;
         const scale = targetWidth / this.width;
@@ -870,7 +991,13 @@ class ImageProcessor {
     }
 }
 
+/**
+ * Manages DOM elements and UI interactions.
+ */
 class UIManager {
+    /**
+     * Initializes the UI manager and caches DOM element references.
+     */
     constructor() {
         this.els = {
             mainCanvas: document.getElementById('mainCanvas'),
@@ -916,7 +1043,13 @@ class UIManager {
     }
 }
 
+/**
+ * Main application class connecting UI and ImageProcessor.
+ */
 class App {
+    /**
+     * Initializes the application, state, and listeners.
+     */
     constructor() {
         this.ui = new UIManager();
         this.processor = new ImageProcessor();
@@ -958,11 +1091,40 @@ class App {
         this.initDefaultImage();
     }
 
+    /**
+     * Calculates the step value from a slider position (exponential curve).
+     * @param {number} val - Slider value (0-100).
+     * @returns {number} The calculated step value (2-256).
+     */
     getStepFromSlider(val) { if(val<=0) return 2; return Math.round(2 + 254 * Math.pow(val / 100, 3)); }
+
+    /**
+     * Calculates the slider position from a step value (inverse exponential).
+     * @param {number} val - Step value (2-256).
+     * @returns {number} The calculated slider value (0-100).
+     */
     getSliderFromStep(val) { if(val<=2) return 0; return Math.pow((val - 2) / 254, 1/3) * 100; }
+
+    /**
+     * Converts a slider value (0-100) to a linear byte value (0-255).
+     * @param {number} val - Slider value.
+     * @returns {number} Byte value (0-255).
+     */
     getLinearFromSlider(val) { return Math.round((val / 100) * 255); }
+
+    /**
+     * Converts a linear byte value (0-255) to a slider value (0-100).
+     * @param {number} val - Byte value.
+     * @returns {number} Slider value.
+     */
     getSliderFromLinear(val) { return (val / 255) * 100; }
 
+    /**
+     * Updates the axis values in the state based on slider or number input.
+     * Handles synchronization between slider and number box.
+     * @param {string} idx - The axis index ('1', '2', or '3').
+     * @param {string} source - The source of change ('slider' or 'number').
+     */
     updateAxisValue(idx, source) {
         const slider = this.ui.els[`inpAxis${idx}`];
         const number = this.ui.els[`numAxis${idx}`];
@@ -984,6 +1146,9 @@ class App {
         this.debounceProcess();
     }
 
+    /**
+     * Updates the UI state (visibility of axes) based on selected palette mode.
+     */
     updateUIState() {
         const config = this.PALETTE_CONFIG[this.state.palette] || this.PALETTE_CONFIG['default'];
         const show = config.show || [false, false, false];
@@ -1000,6 +1165,9 @@ class App {
         });
     }
 
+    /**
+     * Initializes the default startup image.
+     */
     initDefaultImage() {
         const img = new Image();
         img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNiAAAABgADNjd8qAAAAABJRU5ErkJggg==";
@@ -1029,6 +1197,9 @@ class App {
         };
     }
 
+    /**
+     * Initializes all event listeners for UI controls.
+     */
     initListeners() {
         // Universal Bind for Slider <-> Input synchronization
         const bind = (id, key) => {
@@ -1178,6 +1349,10 @@ class App {
         this.updateUIState();
     }
 
+    /**
+     * Handles file input change (drag/drop or menu).
+     * @param {File} file - The uploaded file.
+     */
     handleFile(file) {
         if (!file || !file.type.startsWith('image/')) return;
         const reader = new FileReader();
@@ -1196,6 +1371,9 @@ class App {
         reader.readAsDataURL(file);
     }
 
+    /**
+     * Sets up mouse and touch interactions for the viewport (pan and zoom).
+     */
     setupViewportInteraction() {
         const container = this.ui.els.viewport;
         let isDragging = false;
@@ -1230,19 +1408,32 @@ class App {
         container.addEventListener('touchend', () => isDragging = false);
     }
 
+    /**
+     * Updates the CSS transform of the canvas based on zoom and pan state.
+     */
     updateTransform() {
         this.ui.els.canvasWrapper.style.transform = `translate(${this.state.panX}px, ${this.state.panY}px) scale(${this.state.zoom})`;
     }
     
+    /**
+     * Updates the zoom percentage display in the status bar.
+     */
     updateZoomStatus() {
         this.ui.els.statusZoom.innerText = `${Math.round(this.state.zoom * 100)}%`;
     }
 
+    /**
+     * Debounces the image processing to prevent excessive re-renders during slider dragging.
+     */
     debounceProcess() {
         if (this.debounceTimer) clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => this.triggerProcess(), 200);
     }
 
+    /**
+     * Triggers the image processing pipeline with the current state.
+     * Manages loading states and UI updates.
+     */
     triggerProcess() {
         if (!this.originalSrc || this.isProcessing) return;
         this.isProcessing = true;
@@ -1266,6 +1457,10 @@ class App {
         });
     }
 
+    /**
+     * Saves the processed image to the user's computer.
+     * Upscales the image if an export scale factor is set.
+     */
     saveImage() {
         if(!this.processedData) return;
         const exportCvs = document.createElement('canvas');
