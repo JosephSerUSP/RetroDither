@@ -1321,7 +1321,11 @@ class App {
         const vp = this.ui.els.viewport;
         const overlay = this.ui.els.dragOverlay;
         vp.addEventListener('dragover', (e) => { e.preventDefault(); overlay.classList.remove('hidden'); });
-        vp.addEventListener('dragleave', (e) => { e.preventDefault(); overlay.classList.add('hidden'); });
+        vp.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            if (e.relatedTarget && vp.contains(e.relatedTarget)) return;
+            overlay.classList.add('hidden');
+        });
         vp.addEventListener('drop', (e) => { e.preventDefault(); overlay.classList.add('hidden'); this.handleFile(e.dataTransfer.files[0]); });
         
         const btnCompare = this.ui.els.btnCompare;
