@@ -312,6 +312,45 @@
             .app-body { flex-direction: column-reverse; }
             .sidebar { width: 100%; height: 250px; flex: none; border-top: 2px solid black;}
         }
+
+        /* --- NEW UI ELEMENTS --- */
+        .tool-btn.active {
+            background: var(--win-blue);
+            color: white !important;
+            border-top: 2px solid var(--win-black);
+            border-left: 2px solid var(--win-black);
+            border-right: 2px solid var(--win-light);
+            border-bottom: 2px solid var(--win-light);
+        }
+        .layer-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px;
+            cursor: pointer;
+            border: 1px dotted transparent;
+            font-size: 1.1rem;
+        }
+        .layer-item:hover {
+            border: 1px dotted black;
+        }
+        .layer-item.active {
+            background: var(--win-blue);
+            color: white;
+        }
+        .layer-vis {
+            min-width: 20px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .layer-thumb {
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--win-dark);
+            background: #ccc;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
@@ -358,6 +397,54 @@
         <!-- Sidebar -->
         <div class="sidebar">
             
+            <!-- Tools -->
+            <div class="group-box bevel-down">
+                <span class="group-label">TOOLS</span>
+                <div class="flex gap-1 mt-1">
+                    <button id="toolMove" class="bevel-up bevel-btn flex-1 py-1 font-bold text-sm tool-btn" title="Move Layer (V)">MOVE</button>
+                    <button id="toolHand" class="bevel-up bevel-btn flex-1 py-1 font-bold text-sm tool-btn" title="Pan View (H/Space)">HAND</button>
+                    <button id="toolPick" class="bevel-up bevel-btn flex-1 py-1 font-bold text-sm tool-btn" title="Mask Key Picker (I)">PICK</button>
+                </div>
+            </div>
+
+            <!-- Layer List -->
+            <div class="group-box bevel-down flex flex-col" style="min-height: 180px; max-height: 180px;">
+                <span class="group-label">LAYERS</span>
+                <div id="layerList" class="flex-1 overflow-y-auto bg-white border border-gray-400 p-1 flex flex-col gap-1 mt-1">
+                    <!-- Layers injected here -->
+                </div>
+                <div class="flex justify-between mt-2">
+                    <button id="btnLayerUp" class="bevel-up bevel-btn px-3 text-xs font-bold">▲</button>
+                    <button id="btnLayerDown" class="bevel-up bevel-btn px-3 text-xs font-bold">▼</button>
+                    <button id="btnLayerDel" class="bevel-up bevel-btn px-2 text-xs bg-red-200 font-bold">DEL</button>
+                </div>
+            </div>
+
+            <!-- Layer Masking -->
+            <div class="group-box bevel-down" id="groupMasking">
+                <span class="group-label">LAYER MASKING</span>
+                <div class="flex items-center gap-2 mb-1 mt-1">
+                    <label class="flex items-center text-sm cursor-pointer select-none">
+                        <input type="checkbox" id="chkMask" class="w31-checkbox">
+                        <span>ENABLE</span>
+                    </label>
+                    <div class="flex-1 flex gap-1 items-center">
+                        <div id="maskColorPreview" class="w-6 h-6 border border-black bg-green-500 cursor-pointer" title="Click to pick color"></div>
+                        <input type="text" id="inpMaskHex" class="w-full text-xs font-mono border border-gray-400 px-1 h-6" value="#00FF00">
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 mb-1">
+                    <label class="w-8 text-sm">THR</label>
+                    <input type="range" id="inpMaskThresh" min="0" max="100" value="10">
+                    <input type="number" id="valMaskThresh" class="w31-num" value="10">
+                </div>
+                <div class="flex items-center gap-2 mb-1">
+                    <label class="w-8 text-sm">SFT</label>
+                    <input type="range" id="inpMaskSoft" min="0" max="50" value="0">
+                    <input type="number" id="valMaskSoft" class="w31-num" value="0">
+                </div>
+            </div>
+
             <!-- Horizontal Scale (Editable) -->
             <div class="group-box bevel-down">
                 <span class="group-label">HORIZONTAL SCALE</span>
@@ -801,6 +888,192 @@ const DitherStrategies = {
 };
 
 /**
+ * Represents a single image layer with position, visibility, and masking.
+ */
+class Layer {
+    constructor(id, name, img, x, y) {
+        this.id = id;
+        this.name = name;
+        this.img = img;
+        this.x = x;
+        this.y = y;
+        this.visible = true;
+        this.mask = {
+            enabled: false,
+            color: {r: 0, g: 255, b: 0},
+            threshold: 10,
+            softness: 0
+        };
+        this.cacheCanvas = document.createElement('canvas');
+        this.cacheCtx = this.cacheCanvas.getContext('2d');
+        this.isDirty = true;
+        this.updateCache();
+    }
+
+    setMaskColor(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        if(result) {
+            this.mask.color = {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            };
+            this.isDirty = true;
+        }
+    }
+
+    getMaskHex() {
+        const c = this.mask.color;
+        return "#" + ((1 << 24) + (c.r << 16) + (c.g << 8) + c.b).toString(16).slice(1).toUpperCase();
+    }
+
+    updateCache() {
+        this.cacheCanvas.width = this.img.width;
+        this.cacheCanvas.height = this.img.height;
+        this.cacheCtx.drawImage(this.img, 0, 0);
+
+        if (this.mask.enabled) {
+            const w = this.img.width, h = this.img.height;
+            const imgData = this.cacheCtx.getImageData(0, 0, w, h);
+            const data = imgData.data;
+            const key = this.mask.color;
+            const thresh = (this.mask.threshold / 100) * 442; // Max Euclidean dist is sqrt(255^2 * 3) ~ 441.6
+            const soft = (this.mask.softness / 50) * 100; // arbitrary scale
+
+            for(let i=0; i<data.length; i+=4) {
+                const r = data[i], g = data[i+1], b = data[i+2];
+                const dist = Math.sqrt((r-key.r)**2 + (g-key.g)**2 + (b-key.b)**2);
+
+                if (dist < thresh) {
+                    data[i+3] = 0;
+                } else if (dist < thresh + soft) {
+                    const alpha = (dist - thresh) / soft;
+                    data[i+3] = Math.floor(alpha * 255);
+                }
+            }
+            this.cacheCtx.putImageData(imgData, 0, 0);
+        }
+        this.isDirty = false;
+    }
+
+    getCanvas() {
+        if(this.isDirty) this.updateCache();
+        return this.cacheCanvas;
+    }
+}
+
+/**
+ * Manages the stack of layers and composition.
+ */
+class LayerManager {
+    constructor(redrawCallback) {
+        this.layers = [];
+        this.activeLayerId = null;
+        this.width = 0;
+        this.height = 0;
+        this.redraw = redrawCallback; // Callback to trigger app process
+        this.uiUpdateCallback = null; // Callback to update layer list UI
+    }
+
+    addLayer(img, name) {
+        const id = Date.now().toString();
+        // If first layer, set base dimensions
+        if (this.layers.length === 0) {
+            this.width = img.width;
+            this.height = img.height;
+            // Center? No, just 0,0
+            const layer = new Layer(id, name, img, 0, 0);
+            this.layers.push(layer);
+        } else {
+            // Center new layer
+            const x = Math.floor((this.width - img.width) / 2);
+            const y = Math.floor((this.height - img.height) / 2);
+            const layer = new Layer(id, name, img, x, y);
+            this.layers.push(layer);
+        }
+        this.activeLayerId = id;
+        if(this.uiUpdateCallback) this.uiUpdateCallback();
+        return id;
+    }
+
+    getActive() {
+        return this.layers.find(l => l.id === this.activeLayerId);
+    }
+
+    setActive(id) {
+        this.activeLayerId = id;
+        if(this.uiUpdateCallback) this.uiUpdateCallback();
+    }
+
+    moveActive(dx, dy) {
+        const l = this.getActive();
+        if(l) { l.x += dx; l.y += dy; this.redraw(); }
+    }
+
+    toggleVis(id) {
+        const l = this.layers.find(l => l.id === id);
+        if(l) {
+            l.visible = !l.visible;
+            if(this.uiUpdateCallback) this.uiUpdateCallback();
+            this.redraw();
+        }
+    }
+
+    deleteActive() {
+        if(!this.activeLayerId) return;
+        const idx = this.layers.findIndex(l => l.id === this.activeLayerId);
+        if(idx >= 0) {
+            this.layers.splice(idx, 1);
+            if(this.layers.length > 0) {
+                // Select next available
+                const newIdx = Math.min(idx, this.layers.length-1);
+                this.activeLayerId = this.layers[newIdx].id;
+            } else {
+                this.activeLayerId = null;
+            }
+            if(this.uiUpdateCallback) this.uiUpdateCallback();
+            this.redraw();
+        }
+    }
+
+    moveOrder(dir) { // -1 (down) or 1 (up)
+        if(!this.activeLayerId) return;
+        const idx = this.layers.findIndex(l => l.id === this.activeLayerId);
+        if(idx < 0) return;
+
+        const newIdx = idx + dir;
+        // Check bounds. Arrays: 0 is bottom, length-1 is top?
+        // Rendering: iterate 0..len. So 0 is bottom (background).
+        // UI: List usually shows top at top.
+        // So "Up" means higher index. "Down" means lower index.
+
+        if(newIdx >= 0 && newIdx < this.layers.length) {
+            const temp = this.layers[idx];
+            this.layers[idx] = this.layers[newIdx];
+            this.layers[newIdx] = temp;
+            if(this.uiUpdateCallback) this.uiUpdateCallback();
+            this.redraw();
+        }
+    }
+
+    getComposite() {
+        const cvs = document.createElement('canvas');
+        cvs.width = this.width || 1;
+        cvs.height = this.height || 1;
+        const ctx = cvs.getContext('2d');
+
+        // Fill background? Maybe transparent.
+
+        this.layers.forEach(l => {
+            if(l.visible) {
+                ctx.drawImage(l.getCanvas(), l.x, l.y);
+            }
+        });
+        return cvs;
+    }
+}
+
+/**
  * Handles image loading, processing, and pixel manipulation.
  */
 class ImageProcessor {
@@ -818,12 +1091,15 @@ class ImageProcessor {
      * Loads an image into the processor's source canvas.
      * @param {HTMLImageElement} img - The source image element.
      */
-    loadImage(img) {
-        this.width = img.width;
-        this.height = img.height;
-        this.srcCanvas.width = this.width;
-        this.srcCanvas.height = this.height;
-        this.srcCtx.drawImage(img, 0, 0);
+    loadImage(source) {
+        if(source instanceof HTMLImageElement || source instanceof HTMLCanvasElement) {
+            this.width = source.width;
+            this.height = source.height;
+            this.srcCanvas.width = this.width;
+            this.srcCanvas.height = this.height;
+            this.srcCtx.clearRect(0, 0, this.width, this.height);
+            this.srcCtx.drawImage(source, 0, 0);
+        }
     }
 
     /**
@@ -1027,7 +1303,23 @@ class UIManager {
             valBrightness: document.getElementById('valBrightness'),
             valSat: document.getElementById('valSat'),
             valDitherMix: document.getElementById('valDitherMix'),
-            valDitherAmt: document.getElementById('valDitherAmt')
+            valDitherAmt: document.getElementById('valDitherAmt'),
+            // New UI
+            toolMove: document.getElementById('toolMove'),
+            toolHand: document.getElementById('toolHand'),
+            toolPick: document.getElementById('toolPick'),
+            layerList: document.getElementById('layerList'),
+            btnLayerUp: document.getElementById('btnLayerUp'),
+            btnLayerDown: document.getElementById('btnLayerDown'),
+            btnLayerDel: document.getElementById('btnLayerDel'),
+            groupMasking: document.getElementById('groupMasking'),
+            chkMask: document.getElementById('chkMask'),
+            maskColorPreview: document.getElementById('maskColorPreview'),
+            inpMaskHex: document.getElementById('inpMaskHex'),
+            inpMaskThresh: document.getElementById('inpMaskThresh'),
+            valMaskThresh: document.getElementById('valMaskThresh'),
+            inpMaskSoft: document.getElementById('inpMaskSoft'),
+            valMaskSoft: document.getElementById('valMaskSoft'),
         };
     }
 }
@@ -1044,6 +1336,10 @@ class App {
         this.processor = new ImageProcessor();
         this.ctx = this.ui.els.mainCanvas.getContext('2d');
         
+        // New Managers
+        this.layerManager = new LayerManager(() => this.triggerProcess());
+        this.layerManager.uiUpdateCallback = () => this.updateLayerUI();
+
         this.PALETTE_CONFIG = {
             'math_dynamic_xy': { labels: ['Steps', 'Bias (R/G)'], types: ['step', 'linear'], show: [true, true, false] },
             'math_rgb_split': { labels: ['R Steps', 'G Steps', 'B Steps'], types: ['step', 'step', 'step'], show: [true, true, true] },
@@ -1069,15 +1365,17 @@ class App {
             zoom: 1, panX: 0, panY: 0,
             zoomSnap: true,
             axis1: 8, axis2: 50, axis3: 8,
-            useRedmean: true
+            useRedmean: true,
+            // New Tool State
+            activeTool: 'move' // 'move', 'hand', 'pick'
         };
 
-        this.originalSrc = null;
         this.processedData = null;
         this.isProcessing = false;
 
         this.initListeners();
         this.initDefaultImage();
+        this.updateToolUI();
     }
 
     /**
@@ -1154,6 +1452,75 @@ class App {
         });
     }
 
+    updateToolUI() {
+        const { toolMove, toolHand, toolPick } = this.ui.els;
+        [toolMove, toolHand, toolPick].forEach(b => b.classList.remove('active'));
+        if(this.state.activeTool === 'move') toolMove.classList.add('active');
+        if(this.state.activeTool === 'hand') toolHand.classList.add('active');
+        if(this.state.activeTool === 'pick') toolPick.classList.add('active');
+
+        // Cursor
+        const vp = this.ui.els.viewport;
+        if(this.state.activeTool === 'hand') vp.style.cursor = 'grab';
+        else if(this.state.activeTool === 'pick') vp.style.cursor = 'crosshair';
+        else vp.style.cursor = 'default';
+    }
+
+    updateLayerUI() {
+        const list = this.ui.els.layerList;
+        list.innerHTML = '';
+        const layers = [...this.layerManager.layers].reverse(); // UI shows top first
+
+        layers.forEach(l => {
+            const el = document.createElement('div');
+            el.className = 'layer-item';
+            if(l.id === this.layerManager.activeLayerId) el.classList.add('active');
+
+            // Visibility
+            const vis = document.createElement('div');
+            vis.className = 'layer-vis';
+            vis.innerText = l.visible ? '👁' : '·';
+            vis.onclick = (e) => { e.stopPropagation(); this.layerManager.toggleVis(l.id); };
+
+            // Thumbnail (tiny canvas)
+            const thumb = document.createElement('canvas');
+            thumb.className = 'layer-thumb';
+            thumb.width = 24; thumb.height = 24;
+            const tCtx = thumb.getContext('2d');
+            tCtx.drawImage(l.img, 0, 0, 24, 24);
+
+            const name = document.createElement('span');
+            name.innerText = l.name;
+            name.className = "text-xs truncate flex-1 font-bold";
+
+            el.appendChild(vis);
+            el.appendChild(thumb);
+            el.appendChild(name);
+            el.onclick = () => { this.layerManager.setActive(l.id); this.updateMaskUI(); };
+            list.appendChild(el);
+        });
+
+        this.updateMaskUI();
+    }
+
+    updateMaskUI() {
+        const l = this.layerManager.getActive();
+        const g = this.ui.els.groupMasking;
+        if (!l) {
+            // Disable or dim?
+            return;
+        }
+
+        // Sync controls with active layer
+        this.ui.els.chkMask.checked = l.mask.enabled;
+        this.ui.els.inpMaskHex.value = l.getMaskHex();
+        this.ui.els.maskColorPreview.style.backgroundColor = l.getMaskHex();
+        this.ui.els.inpMaskThresh.value = l.mask.threshold;
+        this.ui.els.valMaskThresh.value = l.mask.threshold;
+        this.ui.els.inpMaskSoft.value = l.mask.softness;
+        this.ui.els.valMaskSoft.value = l.mask.softness;
+    }
+
     /**
      * Initializes the default startup image.
      */
@@ -1178,8 +1545,7 @@ class App {
             ctx.fillText("DROP IMAGE", 80, 150);
             const finalImg = new Image();
             finalImg.onload = () => {
-                this.originalSrc = finalImg;
-                this.processor.loadImage(finalImg);
+                this.layerManager.addLayer(finalImg, "Background");
                 this.triggerProcess();
             };
             finalImg.src = cvs.toDataURL();
@@ -1219,6 +1585,50 @@ class App {
                 });
             }
         };
+
+        // Tools
+        const setTool = (t) => { this.state.activeTool = t; this.updateToolUI(); };
+        this.ui.els.toolMove.onclick = () => setTool('move');
+        this.ui.els.toolHand.onclick = () => setTool('hand');
+        this.ui.els.toolPick.onclick = () => setTool('pick');
+
+        // Layer Controls
+        this.ui.els.btnLayerUp.onclick = () => this.layerManager.moveOrder(1);
+        this.ui.els.btnLayerDown.onclick = () => this.layerManager.moveOrder(-1);
+        this.ui.els.btnLayerDel.onclick = () => this.layerManager.deleteActive();
+
+        // Masking Controls
+        const updateMask = () => {
+             const l = this.layerManager.getActive();
+             if(l) {
+                 l.mask.enabled = this.ui.els.chkMask.checked;
+                 l.mask.threshold = parseInt(this.ui.els.inpMaskThresh.value);
+                 l.mask.softness = parseInt(this.ui.els.inpMaskSoft.value);
+                 l.setMaskColor(this.ui.els.inpMaskHex.value);
+
+                 // Sync inputs
+                 this.ui.els.valMaskThresh.value = l.mask.threshold;
+                 this.ui.els.valMaskSoft.value = l.mask.softness;
+                 this.ui.els.maskColorPreview.style.backgroundColor = l.getMaskHex();
+
+                 l.isDirty = true;
+                 this.triggerProcess();
+             }
+        };
+        this.ui.els.chkMask.addEventListener('change', updateMask);
+        this.ui.els.inpMaskThresh.addEventListener('input', updateMask);
+        this.ui.els.valMaskThresh.addEventListener('input', (e) => { this.ui.els.inpMaskThresh.value = e.target.value; updateMask(); });
+        this.ui.els.inpMaskSoft.addEventListener('input', updateMask);
+        this.ui.els.valMaskSoft.addEventListener('input', (e) => { this.ui.els.inpMaskSoft.value = e.target.value; updateMask(); });
+        this.ui.els.inpMaskHex.addEventListener('change', updateMask);
+
+        // Keyboard Shortcuts
+        window.addEventListener('keydown', (e) => {
+            if(e.target.tagName === 'INPUT') return;
+            if(e.key.toLowerCase() === 'v') setTool('move');
+            if(e.key.toLowerCase() === 'h' || e.key === ' ') setTool('hand');
+            if(e.key.toLowerCase() === 'i') setTool('pick');
+        });
 
         const { inpRes, valRes, chkSnap, menuBtnFile, dropdownFile, menuBtnPref, dropdownPref } = this.ui.els;
 
@@ -1367,11 +1777,16 @@ class App {
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
-                this.originalSrc = img;
-                this.processor.loadImage(img);
-                this.state.zoom = 1; this.state.panX = 0; this.state.panY = 0;
-                this.updateTransform();
-                this.updateZoomStatus();
+                // Add as new layer
+                const name = file.name || "Layer " + (this.layerManager.layers.length + 1);
+                this.layerManager.addLayer(img, name);
+
+                // If it's the first layer, reset view?
+                if (this.layerManager.layers.length === 1) {
+                    this.state.zoom = 1; this.state.panX = 0; this.state.panY = 0;
+                    this.updateTransform();
+                    this.updateZoomStatus();
+                }
                 this.triggerProcess();
             };
             img.src = e.target.result;
@@ -1384,35 +1799,103 @@ class App {
      */
     setupViewportInteraction() {
         const container = this.ui.els.viewport;
+        const mainCanvas = this.ui.els.mainCanvas;
         let isDragging = false;
         let lastX, lastY;
+
         container.addEventListener('wheel', (e) => {
             e.preventDefault();
-            
             if (this.state.zoomSnap) {
-                // Snap mode: +/- 100% (1.0)
                 const direction = e.deltaY > 0 ? -1 : 1;
                 let newZoom = Math.round(this.state.zoom + direction);
-                newZoom = Math.max(1, newZoom); // Minimum 100%
+                newZoom = Math.max(1, newZoom);
                 this.state.zoom = newZoom;
             } else {
-                // Fluid mode
                 this.state.zoom *= (e.deltaY > 0 ? 0.9 : 1.1);
             }
-            
             this.updateTransform();
             this.updateZoomStatus();
         });
-        container.addEventListener('mousedown', (e) => { isDragging = true; lastX = e.clientX; lastY = e.clientY; });
-        window.addEventListener('mousemove', (e) => {
+
+        const startDrag = (cx, cy) => {
+            if (this.state.activeTool === 'pick') {
+                // Picking Logic
+                const rect = mainCanvas.getBoundingClientRect();
+                const x = (cx - rect.left) / (rect.width / mainCanvas.width);
+                const y = (cy - rect.top) / (rect.height / mainCanvas.height);
+
+                const scaleX = this.layerManager.width / mainCanvas.width;
+                const scaleY = this.layerManager.height / mainCanvas.height;
+
+                const fullX = x * scaleX;
+                const fullY = y * scaleY;
+
+                const l = this.layerManager.getActive();
+                if (l) {
+                    const lx = Math.floor(fullX - l.x);
+                    const ly = Math.floor(fullY - l.y);
+
+                    if (lx >= 0 && ly >= 0 && lx < l.img.width && ly < l.img.height) {
+                         const tmp = document.createElement('canvas');
+                         tmp.width = 1; tmp.height = 1;
+                         const tctx = tmp.getContext('2d');
+                         tctx.drawImage(l.img, -lx, -ly);
+                         const p = tctx.getImageData(0,0,1,1).data;
+                         const hex = "#" + ((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1).toUpperCase();
+
+                         this.ui.els.inpMaskHex.value = hex;
+                         const event = new Event('change');
+                         this.ui.els.inpMaskHex.dispatchEvent(event);
+                    }
+                }
+                return;
+            }
+            isDragging = true;
+            lastX = cx;
+            lastY = cy;
+        };
+
+        const moveDrag = (cx, cy) => {
             if (!isDragging) return;
-            this.state.panX += e.clientX - lastX; this.state.panY += e.clientY - lastY;
-            lastX = e.clientX; lastY = e.clientY;
-            this.updateTransform();
+            // standard pan uses screen pixels
+            const dx = cx - lastX;
+            const dy = cy - lastY;
+            lastX = cx;
+            lastY = cy;
+
+            if (this.state.activeTool === 'move') {
+                // Moving layers requires scaling delta by zoom and process scale ratio
+                // Canvas visual size vs composite size
+                const processedW = this.state.width;
+                const compositeW = this.layerManager.width;
+                // Avoid division by zero
+                if(processedW === 0 || this.state.zoom === 0) return;
+
+                const ratio = compositeW / processedW;
+                const z = this.state.zoom;
+
+                this.layerManager.moveActive((dx / z) * ratio, (dy / z) * ratio);
+            } else if (this.state.activeTool === 'hand') {
+                this.state.panX += dx;
+                this.state.panY += dy;
+                this.updateTransform();
+            }
+        };
+
+        container.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+        window.addEventListener('mousemove', (e) => {
+            if(!isDragging) return;
+            moveDrag(e.clientX, e.clientY);
         });
         window.addEventListener('mouseup', () => isDragging = false);
-        container.addEventListener('touchstart', (e) => { if(e.touches.length === 1) { isDragging = true; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; } });
-        container.addEventListener('touchmove', (e) => { if(isDragging && e.touches.length === 1) { e.preventDefault(); this.state.panX += e.touches[0].clientX - lastX; this.state.panY += e.touches[0].clientY - lastY; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; this.updateTransform(); } });
+
+        container.addEventListener('touchstart', (e) => { if(e.touches.length === 1) startDrag(e.touches[0].clientX, e.touches[0].clientY); });
+        container.addEventListener('touchmove', (e) => {
+            if(isDragging && e.touches.length === 1) {
+                e.preventDefault();
+                moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
         container.addEventListener('touchend', () => isDragging = false);
     }
 
@@ -1443,10 +1926,14 @@ class App {
      * Manages loading states and UI updates.
      */
     triggerProcess() {
-        if (!this.originalSrc || this.isProcessing) return;
+        if (this.layerManager.layers.length === 0 || this.isProcessing) return;
         this.isProcessing = true;
         this.ui.els.loadingOverlay.classList.remove('hidden');
         
+        // Get Composite
+        const composite = this.layerManager.getComposite();
+        this.processor.loadImage(composite);
+
         const options = {
             ...this.state,
             targetWidth: this.state.width,
