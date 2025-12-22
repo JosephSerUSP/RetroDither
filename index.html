@@ -336,6 +336,13 @@
                 <div class="dropdown-item" id="menuSave">Save to Disk</div>
             </div>
         </div>
+        <div class="menu-item" id="menuBtnEdit">
+            <u>E</u>dit
+            <div class="dropdown" id="dropdownEdit">
+                <div class="dropdown-item text-gray-500" id="menuUndo">Undo <span class="ml-4 text-xs text-gray-600">Ctrl+Z</span></div>
+                <div class="dropdown-item text-gray-500" id="menuRedo">Redo <span class="ml-4 text-xs text-gray-600">Ctrl+Y</span></div>
+            </div>
+        </div>
         <div class="menu-item" id="menuBtnPref">
             <u>P</u>references
             <div class="dropdown" id="dropdownPref">
@@ -521,7 +528,7 @@
             <div id="canvasWrapper">
                 <canvas id="mainCanvas"></canvas>
             </div>
-            <div id="dragOverlay" class="overlay-msg hidden"><span>DROP IMAGE HERE</span></div>
+            <div id="dragOverlay" class="overlay-msg hidden pointer-events-none"><span>DROP IMAGE HERE</span></div>
             <div id="loadingOverlay" class="overlay-msg hidden">
                 <span class="animate-pulse">PROCESSING...</span>
                 <span class="text-sm mt-2">PLEASE WAIT</span>
@@ -533,8 +540,10 @@
     <!-- Footer -->
     <div class="status-bar bevel-up flex justify-between px-2 py-1 bg-gray-300 border-t-2 border-white">
         <span id="statusMsg">READY.</span>
-        <div>
-            <span id="statusZoom" class="mr-4">100%</span>
+        <div class="flex items-center">
+            <button id="btnZoomOut" class="bevel-btn px-1 leading-none font-bold text-xs w-6 h-6 mr-1" title="Zoom Out">-</button>
+            <span id="statusZoom" class="w-12 text-center mr-1">100%</span>
+            <button id="btnZoomIn" class="bevel-btn px-1 leading-none font-bold text-xs w-6 h-6 mr-4" title="Zoom In">+</button>
             <span id="statusRes">0 x 0</span>
         </div>
     </div>
@@ -1017,12 +1026,18 @@ class UIManager {
             btnCompare: document.getElementById('btnCompare'),
             menuBtnFile: document.getElementById('menuBtnFile'),
             dropdownFile: document.getElementById('dropdownFile'),
+            menuBtnEdit: document.getElementById('menuBtnEdit'),
+            dropdownEdit: document.getElementById('dropdownEdit'),
+            menuUndo: document.getElementById('menuUndo'),
+            menuRedo: document.getElementById('menuRedo'),
             menuBtnPref: document.getElementById('menuBtnPref'),
             dropdownPref: document.getElementById('dropdownPref'),
             menuLoad: document.getElementById('menuLoad'),
             menuSave: document.getElementById('menuSave'),
             menuZoomSnap: document.getElementById('menuZoomSnap'),
             checkZoomSnap: document.getElementById('check-zoom-snap'),
+            btnZoomIn: document.getElementById('btnZoomIn'),
+            btnZoomOut: document.getElementById('btnZoomOut'),
             valContrast: document.getElementById('valContrast'),
             valBrightness: document.getElementById('valBrightness'),
             valSat: document.getElementById('valSat'),
@@ -1072,12 +1087,147 @@ class App {
             useRedmean: true
         };
 
+        this.history = [];
+        this.historyIndex = -1;
+
         this.originalSrc = null;
         this.processedData = null;
         this.isProcessing = false;
 
         this.initListeners();
         this.initDefaultImage();
+        this.saveHistory();
+    }
+
+    /**
+     * Deep clones the current state object.
+     * @returns {Object} A copy of the state.
+     */
+    cloneState() {
+        return JSON.parse(JSON.stringify(this.state));
+    }
+
+    /**
+     * Saves the current state to history.
+     */
+    saveHistory() {
+        if (this.historyIndex < this.history.length - 1) {
+            this.history = this.history.slice(0, this.historyIndex + 1);
+        }
+
+        if (this.history.length > 50) {
+            this.history.shift();
+            this.historyIndex--;
+        }
+
+        const newState = this.cloneState();
+        if (this.historyIndex >= 0) {
+            const lastState = this.history[this.historyIndex];
+            if (JSON.stringify(newState) === JSON.stringify(lastState)) {
+                return;
+            }
+        }
+
+        this.history.push(newState);
+        this.historyIndex++;
+        this.updateHistoryUI();
+    }
+
+    /**
+     * Undoes the last action.
+     */
+    undo() {
+        if (this.historyIndex > 0) {
+            this.historyIndex--;
+            this.state = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+            this.syncUIFromState();
+            this.triggerProcess();
+            this.updateTransform();
+            this.updateZoomStatus();
+            this.updateHistoryUI();
+        }
+    }
+
+    /**
+     * Redoes the last undone action.
+     */
+    redo() {
+        if (this.historyIndex < this.history.length - 1) {
+            this.historyIndex++;
+            this.state = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+            this.syncUIFromState();
+            this.triggerProcess();
+            this.updateTransform();
+            this.updateZoomStatus();
+            this.updateHistoryUI();
+        }
+    }
+
+    /**
+     * Updates the enable/disable state of Undo/Redo menu items.
+     */
+    updateHistoryUI() {
+        const canUndo = this.historyIndex > 0;
+        const canRedo = this.historyIndex < this.history.length - 1;
+
+        const undoBtn = this.ui.els.menuUndo;
+        const redoBtn = this.ui.els.menuRedo;
+
+        if (canUndo) {
+            undoBtn.classList.remove('disabled', 'text-gray-500');
+        } else {
+            undoBtn.classList.add('disabled', 'text-gray-500');
+        }
+
+        if (canRedo) {
+            redoBtn.classList.remove('disabled', 'text-gray-500');
+        } else {
+            redoBtn.classList.add('disabled', 'text-gray-500');
+        }
+    }
+
+    /**
+     * Synchronizes UI controls to match the current state.
+     */
+    syncUIFromState() {
+        const s = this.state;
+        const u = this.ui.els;
+
+        const sync = (key, sliderId, numId) => {
+            if (u[sliderId]) u[sliderId].value = s[key];
+            if (u[numId]) u[numId].value = s[key];
+        };
+
+        u.inpRes.value = s.width;
+        u.valRes.value = s.width;
+        u.chkSnap.checked = s.snapRes;
+        if(s.snapRes) u.inpRes.step = "32"; else u.inpRes.step = "2";
+
+        sync('contrast', 'inpContrast', 'valContrast');
+        sync('brightness', 'inpBrightness', 'valBrightness');
+        sync('saturation', 'inpSat', 'valSat');
+
+        u.selPalette.value = s.palette;
+        u.chkRedmean.checked = s.useRedmean;
+
+        sync('axis1', 'inpAxis1', 'numAxis1');
+        sync('axis2', 'inpAxis2', 'numAxis2');
+        sync('axis3', 'inpAxis3', 'numAxis3');
+
+        this.updateUIState();
+
+        u.selDither.value = s.ditherType1;
+        u.selDither2.value = s.ditherType2;
+        sync('ditherMix', 'inpDitherMix', 'valDitherMix');
+        sync('ditherAmt', 'inpDitherAmt', 'valDitherAmt');
+
+        document.querySelectorAll('.scale-opt').forEach(el => {
+            document.getElementById(`check-scale-${el.dataset.scale}`).innerText = '';
+        });
+        const scaleCheck = document.getElementById(`check-scale-${s.exportScale}`);
+        if(scaleCheck) scaleCheck.innerText = '✓';
+
+        u.checkZoomSnap.innerText = s.zoomSnap ? '✓' : '';
     }
 
     /**
@@ -1204,6 +1354,8 @@ class App {
                 this.debounceProcess();
             });
 
+            slider.addEventListener('change', () => this.saveHistory());
+
             if(number) {
                 number.addEventListener('input', (e) => {
                     let v = parseInt(e.target.value);
@@ -1217,19 +1369,37 @@ class App {
                     slider.value = v;
                     this.debounceProcess();
                 });
+                number.addEventListener('change', () => this.saveHistory());
             }
         };
 
-        const { inpRes, valRes, chkSnap, menuBtnFile, dropdownFile, menuBtnPref, dropdownPref } = this.ui.els;
+        const { inpRes, valRes, chkSnap, menuBtnFile, dropdownFile, menuBtnEdit, dropdownEdit, menuBtnPref, dropdownPref } = this.ui.els;
 
         // Menu Logic
         const closeMenus = () => {
             dropdownFile.classList.remove('show');
+            dropdownEdit.classList.remove('show');
             dropdownPref.classList.remove('show');
         };
         menuBtnFile.addEventListener('click', (e) => { e.stopPropagation(); const o = dropdownFile.classList.contains('show'); closeMenus(); if(!o) dropdownFile.classList.add('show'); });
+        menuBtnEdit.addEventListener('click', (e) => { e.stopPropagation(); const o = dropdownEdit.classList.contains('show'); closeMenus(); if(!o) dropdownEdit.classList.add('show'); });
         menuBtnPref.addEventListener('click', (e) => { e.stopPropagation(); const o = dropdownPref.classList.contains('show'); closeMenus(); if(!o) dropdownPref.classList.add('show'); });
         document.addEventListener('click', closeMenus);
+
+        // Edit Menu
+        this.ui.els.menuUndo.addEventListener('click', () => this.undo());
+        this.ui.els.menuRedo.addEventListener('click', () => this.redo());
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'z') {
+                e.preventDefault();
+                this.undo();
+            } else if (e.ctrlKey && e.key === 'y') {
+                e.preventDefault();
+                this.redo();
+            }
+        });
 
         // Paste support
         document.addEventListener('paste', (e) => {
@@ -1272,6 +1442,7 @@ class App {
             valRes.value = val;
             this.debounceProcess();
         });
+        inpRes.addEventListener('change', () => this.saveHistory());
 
         valRes.addEventListener('input', (e) => {
              let val = parseInt(e.target.value);
@@ -1282,6 +1453,7 @@ class App {
              inpRes.value = val;
              this.debounceProcess();
         });
+        valRes.addEventListener('change', () => this.saveHistory());
         
         chkSnap.addEventListener('change', (e) => {
             this.state.snapRes = e.target.checked;
@@ -1296,6 +1468,7 @@ class App {
             } else {
                 inpRes.step = "2";
             }
+            this.saveHistory();
         });
 
         bind('inpContrast', 'contrast');
@@ -1310,6 +1483,7 @@ class App {
             el.addEventListener('change', (e) => {
                 this.state[key] = e.target.value;
                 this.debounceProcess();
+                this.saveHistory();
             });
         };
         simpleBind('selDither', 'ditherType1');
@@ -1319,16 +1493,19 @@ class App {
             this.state.palette = e.target.value;
             this.updateUIState();
             this.debounceProcess();
+            this.saveHistory();
         });
 
         document.getElementById('chkRedmean').addEventListener('change', (e) => {
             this.state.useRedmean = e.target.checked;
             this.debounceProcess();
+            this.saveHistory();
         });
 
         ['1','2','3'].forEach(idx => {
             this.ui.els[`inpAxis${idx}`].addEventListener('input', () => this.updateAxisValue(idx, 'slider'));
-            this.ui.els[`numAxis${idx}`].addEventListener('change', () => this.updateAxisValue(idx, 'number'));
+            this.ui.els[`inpAxis${idx}`].addEventListener('change', () => this.saveHistory());
+            this.ui.els[`numAxis${idx}`].addEventListener('change', () => { this.updateAxisValue(idx, 'number'); this.saveHistory(); });
         });
         
         this.ui.els.fileInput.addEventListener('change', (e) => this.handleFile(e.target.files[0]));
@@ -1352,6 +1529,27 @@ class App {
         btnCompare.addEventListener('mouseleave', showProcessed);
         btnCompare.addEventListener('touchstart', (e) => { e.preventDefault(); showOriginal(); });
         btnCompare.addEventListener('touchend', (e) => { e.preventDefault(); showProcessed(); });
+
+        // Zoom Buttons
+        this.ui.els.btnZoomIn.addEventListener('click', () => {
+            if (this.state.zoomSnap) {
+                this.state.zoom = Math.round(this.state.zoom + 1);
+            } else {
+                this.state.zoom *= 1.1;
+            }
+            this.updateTransform();
+            this.updateZoomStatus();
+        });
+
+        this.ui.els.btnZoomOut.addEventListener('click', () => {
+            if (this.state.zoomSnap) {
+                this.state.zoom = Math.max(1, Math.round(this.state.zoom - 1));
+            } else {
+                this.state.zoom = Math.max(0.1, this.state.zoom * 0.9);
+            }
+            this.updateTransform();
+            this.updateZoomStatus();
+        });
 
         this.setupViewportInteraction();
         this.updateUIState();
@@ -1487,7 +1685,7 @@ class App {
     }
 }
 
-window.onload = () => new App();
+window.onload = () => { window.app = new App(); };
 </script>
 </body>
 </html>
