@@ -305,6 +305,7 @@
             font-size: 2rem;
             text-shadow: 2px 2px #000;
             backdrop-filter: blur(2px);
+            pointer-events: none;
         }
 
         /* Responsive */
@@ -334,6 +335,13 @@
                 <div class="dropdown-item" id="menuLoad">Load Image...</div>
                 <div class="dropdown-separator"></div>
                 <div class="dropdown-item" id="menuSave">Save to Disk</div>
+            </div>
+        </div>
+        <div class="menu-item" id="menuBtnEdit">
+            <u>E</u>dit
+            <div class="dropdown" id="dropdownEdit">
+                <div class="dropdown-item" id="menuUndo"><span>Undo</span> <span class="text-xs text-gray-500">Ctrl+Z</span></div>
+                <div class="dropdown-item" id="menuRedo"><span>Redo</span> <span class="text-xs text-gray-500">Ctrl+Y</span></div>
             </div>
         </div>
         <div class="menu-item" id="menuBtnPref">
@@ -1019,14 +1027,25 @@ class UIManager {
             dropdownFile: document.getElementById('dropdownFile'),
             menuBtnPref: document.getElementById('menuBtnPref'),
             dropdownPref: document.getElementById('dropdownPref'),
+            menuBtnEdit: document.getElementById('menuBtnEdit'),
+            dropdownEdit: document.getElementById('dropdownEdit'),
+            menuUndo: document.getElementById('menuUndo'),
+            menuRedo: document.getElementById('menuRedo'),
             menuLoad: document.getElementById('menuLoad'),
             menuSave: document.getElementById('menuSave'),
             menuZoomSnap: document.getElementById('menuZoomSnap'),
             checkZoomSnap: document.getElementById('check-zoom-snap'),
+            inpContrast: document.getElementById('inpContrast'),
             valContrast: document.getElementById('valContrast'),
+            inpBrightness: document.getElementById('inpBrightness'),
             valBrightness: document.getElementById('valBrightness'),
+            inpSat: document.getElementById('inpSat'),
             valSat: document.getElementById('valSat'),
+            selDither: document.getElementById('selDither'),
+            selDither2: document.getElementById('selDither2'),
+            inpDitherMix: document.getElementById('inpDitherMix'),
             valDitherMix: document.getElementById('valDitherMix'),
+            inpDitherAmt: document.getElementById('inpDitherAmt'),
             valDitherAmt: document.getElementById('valDitherAmt')
         };
     }
@@ -1071,6 +1090,9 @@ class App {
             axis1: 8, axis2: 50, axis3: 8,
             useRedmean: true
         };
+
+        this.history = [];
+        this.historyIndex = -1;
 
         this.originalSrc = null;
         this.processedData = null;
@@ -1154,6 +1176,107 @@ class App {
         });
     }
 
+    saveHistory() {
+        if (this.isRestoringHistory) return;
+        // If we are not at the end of history, discard future
+        if (this.historyIndex < this.history.length - 1) {
+            this.history = this.history.slice(0, this.historyIndex + 1);
+        }
+        this.history.push(JSON.parse(JSON.stringify(this.state)));
+        if (this.history.length > 50) this.history.shift();
+        this.historyIndex = this.history.length - 1;
+        this.updateUndoRedoUI();
+    }
+
+    undo() {
+        if (this.historyIndex > 0) {
+            this.historyIndex--;
+            this.restoreState(this.history[this.historyIndex]);
+        }
+    }
+
+    redo() {
+        if (this.historyIndex < this.history.length - 1) {
+            this.historyIndex++;
+            this.restoreState(this.history[this.historyIndex]);
+        }
+    }
+
+    restoreState(state) {
+        this.isRestoringHistory = true;
+        this.state = JSON.parse(JSON.stringify(state));
+        this.updateControlsFromState();
+        this.updateUIState();
+        this.triggerProcess();
+        this.updateUndoRedoUI();
+        this.isRestoringHistory = false;
+    }
+
+    updateUndoRedoUI() {
+        const canUndo = this.historyIndex > 0;
+        const canRedo = this.historyIndex < this.history.length - 1;
+
+        if (this.ui.els.menuUndo) {
+            if (canUndo) {
+                this.ui.els.menuUndo.classList.remove('disabled', 'text-gray-400');
+                this.ui.els.menuUndo.style.cursor = 'pointer';
+            } else {
+                this.ui.els.menuUndo.classList.add('disabled', 'text-gray-400');
+                this.ui.els.menuUndo.style.cursor = 'default';
+            }
+        }
+
+        if (this.ui.els.menuRedo) {
+            if (canRedo) {
+                this.ui.els.menuRedo.classList.remove('disabled', 'text-gray-400');
+                this.ui.els.menuRedo.style.cursor = 'pointer';
+            } else {
+                this.ui.els.menuRedo.classList.add('disabled', 'text-gray-400');
+                this.ui.els.menuRedo.style.cursor = 'default';
+            }
+        }
+    }
+
+    updateControlsFromState() {
+        try {
+            const s = this.state;
+            const els = this.ui.els;
+
+            if(els.inpRes) els.inpRes.value = s.width;
+            if(els.valRes) els.valRes.value = s.width;
+            if(els.chkSnap) els.chkSnap.checked = s.snapRes;
+
+            if(els.inpContrast) els.inpContrast.value = s.contrast;
+            if(els.valContrast) els.valContrast.value = s.contrast;
+            if(els.inpBrightness) els.inpBrightness.value = s.brightness;
+            if(els.valBrightness) els.valBrightness.value = s.brightness;
+            if(els.inpSat) els.inpSat.value = s.saturation;
+            if(els.valSat) els.valSat.value = s.saturation;
+
+            if(els.selPalette) els.selPalette.value = s.palette;
+            const chkRedmean = document.getElementById('chkRedmean');
+            if(chkRedmean) chkRedmean.checked = s.useRedmean;
+
+            if(els.selDither) els.selDither.value = s.ditherType1;
+            if(els.selDither2) els.selDither2.value = s.ditherType2;
+            if(els.inpDitherMix) els.inpDitherMix.value = s.ditherMix;
+            if(els.valDitherMix) els.valDitherMix.value = s.ditherMix;
+            if(els.inpDitherAmt) els.inpDitherAmt.value = s.ditherAmt;
+            if(els.valDitherAmt) els.valDitherAmt.value = s.ditherAmt;
+
+            document.querySelectorAll('.scale-opt').forEach(el => {
+                const id = `check-scale-${el.dataset.scale}`;
+                const elCheck = document.getElementById(id);
+                if(elCheck) elCheck.innerText = (parseInt(el.dataset.scale) === s.exportScale) ? '✓' : '';
+            });
+            if(els.checkZoomSnap) els.checkZoomSnap.innerText = s.zoomSnap ? '✓' : '';
+            this.updateZoomStatus();
+            this.updateTransform();
+        } catch (e) {
+            console.error('Error in updateControlsFromState:', e);
+        }
+    }
+
     /**
      * Initializes the default startup image.
      */
@@ -1181,6 +1304,7 @@ class App {
                 this.originalSrc = finalImg;
                 this.processor.loadImage(finalImg);
                 this.triggerProcess();
+                this.saveHistory();
             };
             finalImg.src = cvs.toDataURL();
         };
@@ -1203,6 +1327,7 @@ class App {
                 if(number) number.value = v;
                 this.debounceProcess();
             });
+            slider.addEventListener('change', () => this.saveHistory());
 
             if(number) {
                 number.addEventListener('input', (e) => {
@@ -1217,19 +1342,32 @@ class App {
                     slider.value = v;
                     this.debounceProcess();
                 });
+                number.addEventListener('change', () => this.saveHistory());
             }
         };
 
-        const { inpRes, valRes, chkSnap, menuBtnFile, dropdownFile, menuBtnPref, dropdownPref } = this.ui.els;
+        const { inpRes, valRes, chkSnap, menuBtnFile, dropdownFile, menuBtnPref, dropdownPref, menuBtnEdit, dropdownEdit } = this.ui.els;
 
         // Menu Logic
         const closeMenus = () => {
             dropdownFile.classList.remove('show');
             dropdownPref.classList.remove('show');
+            dropdownEdit.classList.remove('show');
         };
         menuBtnFile.addEventListener('click', (e) => { e.stopPropagation(); const o = dropdownFile.classList.contains('show'); closeMenus(); if(!o) dropdownFile.classList.add('show'); });
         menuBtnPref.addEventListener('click', (e) => { e.stopPropagation(); const o = dropdownPref.classList.contains('show'); closeMenus(); if(!o) dropdownPref.classList.add('show'); });
+        menuBtnEdit.addEventListener('click', (e) => { e.stopPropagation(); const o = dropdownEdit.classList.contains('show'); closeMenus(); if(!o) dropdownEdit.classList.add('show'); });
+
+        this.ui.els.menuUndo.addEventListener('click', (e) => { e.stopPropagation(); this.undo(); closeMenus(); });
+        this.ui.els.menuRedo.addEventListener('click', (e) => { e.stopPropagation(); this.redo(); closeMenus(); });
+
         document.addEventListener('click', closeMenus);
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); this.undo(); }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); this.redo(); }
+        });
 
         // Paste support
         document.addEventListener('paste', (e) => {
@@ -1310,6 +1448,7 @@ class App {
             el.addEventListener('change', (e) => {
                 this.state[key] = e.target.value;
                 this.debounceProcess();
+                this.saveHistory();
             });
         };
         simpleBind('selDither', 'ditherType1');
@@ -1319,16 +1458,19 @@ class App {
             this.state.palette = e.target.value;
             this.updateUIState();
             this.debounceProcess();
+            this.saveHistory();
         });
 
         document.getElementById('chkRedmean').addEventListener('change', (e) => {
             this.state.useRedmean = e.target.checked;
             this.debounceProcess();
+            this.saveHistory();
         });
 
         ['1','2','3'].forEach(idx => {
             this.ui.els[`inpAxis${idx}`].addEventListener('input', () => this.updateAxisValue(idx, 'slider'));
-            this.ui.els[`numAxis${idx}`].addEventListener('change', () => this.updateAxisValue(idx, 'number'));
+            this.ui.els[`inpAxis${idx}`].addEventListener('change', () => this.saveHistory());
+            this.ui.els[`numAxis${idx}`].addEventListener('change', () => { this.updateAxisValue(idx, 'number'); this.saveHistory(); });
         });
         
         this.ui.els.fileInput.addEventListener('change', (e) => this.handleFile(e.target.files[0]));
