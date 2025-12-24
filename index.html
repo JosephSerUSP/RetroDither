@@ -358,6 +358,7 @@
             </div>
         </div>
         <input type="file" id="fileInput" accept="image/*" class="hidden">
+        <input type="file" id="paletteInput" accept=".hex,.txt,image/*" class="hidden">
     </div>
 
     <!-- Main Content -->
@@ -444,6 +445,9 @@
                         <option value="vapor">Vaporwave</option>
                         <option value="matrix">Matrix Code</option>
                         <option value="redscale">Virtual Boy</option>
+                    </optgroup>
+                    <optgroup label="Actions">
+                        <option value="import_custom" class="font-bold text-blue-800">Load Custom...</option>
                     </optgroup>
                 </select>
 
@@ -1009,6 +1013,7 @@ class UIManager {
             viewport: document.getElementById('viewport'),
             dragOverlay: document.getElementById('dragOverlay'),
             fileInput: document.getElementById('fileInput'),
+            paletteInput: document.getElementById('paletteInput'),
             inpAxis1: document.getElementById('inpAxis1'),
             inpAxis2: document.getElementById('inpAxis2'),
             inpAxis3: document.getElementById('inpAxis3'),
@@ -1342,6 +1347,11 @@ class App {
                     slider.value = v;
                     this.debounceProcess();
                 });
+                number.addEventListener('blur', () => {
+                    if (number.value === '' || isNaN(parseInt(number.value))) {
+                        number.value = this.state[key];
+                    }
+                });
                 number.addEventListener('change', () => this.saveHistory());
             }
         };
@@ -1455,10 +1465,22 @@ class App {
         simpleBind('selDither2', 'ditherType2');
 
         this.ui.els.selPalette.addEventListener('change', (e) => {
+            if (e.target.value === 'import_custom') {
+                e.target.value = this.state.palette; // Revert selection
+                this.ui.els.paletteInput.click();
+                return;
+            }
             this.state.palette = e.target.value;
             this.updateUIState();
             this.debounceProcess();
             this.saveHistory();
+        });
+
+        this.ui.els.paletteInput.addEventListener('change', (e) => {
+             if(e.target.files.length > 0) {
+                 this.handlePaletteFile(e.target.files[0]);
+                 e.target.value = '';
+             }
         });
 
         document.getElementById('chkRedmean').addEventListener('change', (e) => {
@@ -1477,13 +1499,27 @@ class App {
 
         const vp = this.ui.els.viewport;
         const overlay = this.ui.els.dragOverlay;
-        vp.addEventListener('dragover', (e) => { e.preventDefault(); overlay.classList.remove('hidden'); });
+        let dragCounter = 0;
+        vp.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            dragCounter++;
+            overlay.classList.remove('hidden');
+        });
         vp.addEventListener('dragleave', (e) => {
             e.preventDefault();
-            if (e.relatedTarget && vp.contains(e.relatedTarget)) return;
-            overlay.classList.add('hidden');
+            dragCounter--;
+            if (dragCounter <= 0) {
+                overlay.classList.add('hidden');
+                dragCounter = 0;
+            }
         });
-        vp.addEventListener('drop', (e) => { e.preventDefault(); overlay.classList.add('hidden'); this.handleFile(e.dataTransfer.files[0]); });
+        vp.addEventListener('dragover', (e) => { e.preventDefault(); });
+        vp.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragCounter = 0;
+            overlay.classList.add('hidden');
+            this.handleFile(e.dataTransfer.files[0]);
+        });
         
         const btnCompare = this.ui.els.btnCompare;
         const showOriginal = () => { if(!this.originalSrc) return; this.ctx.drawImage(this.originalSrc, 0, 0, this.ui.els.mainCanvas.width, this.ui.els.mainCanvas.height); };
@@ -1497,6 +1533,103 @@ class App {
 
         this.setupViewportInteraction();
         this.updateUIState();
+    }
+
+    /**
+     * Parses and loads a custom palette from a file (.hex or image).
+     * @param {File} file
+     */
+    handlePaletteFile(file) {
+        if (file.name.toLowerCase().endsWith('.hex') || file.name.toLowerCase().endsWith('.txt')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target.result;
+                const colors = [];
+                const lines = text.split(/\r?\n/);
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line || line.startsWith(';') || line.startsWith('//')) continue;
+                    // match hex: #RRGGBB or RRGGBB
+                    const match = line.match(/^#?([0-9A-Fa-f]{6})$/);
+                    if (match) {
+                        const hex = match[1];
+                        const r = parseInt(hex.substring(0,2), 16);
+                        const g = parseInt(hex.substring(2,4), 16);
+                        const b = parseInt(hex.substring(4,6), 16);
+                        colors.push([r,g,b]);
+                    }
+                }
+                if (colors.length > 0) {
+                    this.addCustomPalette(file.name, colors);
+                } else {
+                    alert('No valid hex colors found in file.');
+                }
+            };
+            reader.readAsText(file);
+        } else if (file.type.startsWith('image/')) {
+             const reader = new FileReader();
+             reader.onload = (e) => {
+                 const img = new Image();
+                 img.onload = () => {
+                     const cvs = document.createElement('canvas');
+                     cvs.width = img.width; cvs.height = img.height;
+                     const ctx = cvs.getContext('2d');
+                     ctx.drawImage(img, 0, 0);
+                     const data = ctx.getImageData(0,0,img.width,img.height).data;
+                     const colorSet = new Set();
+                     const colors = [];
+                     // Limit scanning to avoid freezing, target ~100k samples max
+                     const step = Math.max(1, Math.floor((img.width * img.height) / 100000));
+
+                     for(let i=0; i<data.length; i+=4*step) {
+                         if(data[i+3] < 128) continue; // transparent
+                         const r = data[i], g = data[i+1], b = data[i+2];
+                         const key = `${r},${g},${b}`;
+                         if(!colorSet.has(key)) {
+                             colorSet.add(key);
+                             colors.push([r,g,b]);
+                             if(colors.length >= 256) break; // Limit to 256
+                         }
+                     }
+
+                     if (colors.length > 0) {
+                         this.addCustomPalette(file.name, colors);
+                     } else {
+                         alert('Could not extract colors from image.');
+                     }
+                 };
+                 img.src = e.target.result;
+             };
+             reader.readAsDataURL(file);
+        }
+    }
+
+    addCustomPalette(name, colors) {
+        const id = 'custom_' + Date.now();
+        PALETTES[id] = colors;
+
+        const select = this.ui.els.selPalette;
+        let customGroup = select.querySelector('optgroup[label="Custom"]');
+        if (!customGroup) {
+            customGroup = document.createElement('optgroup');
+            customGroup.label = "Custom";
+            // Insert before "Actions"
+            const actions = select.querySelector('optgroup[label="Actions"]');
+            if (actions) select.insertBefore(customGroup, actions);
+            else select.appendChild(customGroup);
+        }
+
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.innerText = name.length > 20 ? name.substring(0,18)+'...' : name;
+        opt.innerText += ` (${colors.length})`;
+        customGroup.appendChild(opt);
+
+        select.value = id;
+        this.state.palette = id;
+        this.updateUIState();
+        this.debounceProcess();
+        this.saveHistory();
     }
 
     /**
