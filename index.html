@@ -373,7 +373,7 @@
                 <div class="flex flex-col gap-1 mt-1">
                     <div class="flex justify-between items-end px-1">
                          <div class="flex items-center gap-1">
-                             <input type="number" id="valRes" class="w31-num w-16" value="160">
+                             <input type="number" id="valRes" class="w31-num w-16" value="160" aria-label="Horizontal resolution pixels">
                              <span class="text-sm">px</span>
                          </div>
                          <label class="flex items-center text-sm cursor-pointer select-none">
@@ -381,7 +381,7 @@
                             <span>SNAP 32px</span>
                         </label>
                     </div>
-                    <input type="range" id="inpRes" min="32" max="640" step="32" value="160" class="w-full">
+                    <input type="range" id="inpRes" min="32" max="640" step="32" value="160" class="w-full" aria-label="Horizontal Scale">
                 </div>
             </div>
 
@@ -389,19 +389,19 @@
             <div class="group-box bevel-down">
                 <span class="group-label">COLOR ADJUST</span>
                 <div class="flex items-center gap-2 mb-1 mt-1">
-                    <label class="w-8 text-sm">CON</label>
-                    <input type="range" id="inpContrast" min="-100" max="100" value="0">
-                    <input type="number" id="valContrast" class="w31-num" value="0">
+                    <label for="inpContrast" class="w-8 text-sm" title="Contrast">CON</label>
+                    <input type="range" id="inpContrast" min="-100" max="100" value="0" aria-label="Contrast">
+                    <input type="number" id="valContrast" class="w31-num" value="0" aria-label="Contrast Value">
                 </div>
                 <div class="flex items-center gap-2 mb-1">
-                    <label class="w-8 text-sm">BRI</label>
-                    <input type="range" id="inpBrightness" min="-100" max="100" value="0">
-                    <input type="number" id="valBrightness" class="w31-num" value="0">
+                    <label for="inpBrightness" class="w-8 text-sm" title="Brightness">BRI</label>
+                    <input type="range" id="inpBrightness" min="-100" max="100" value="0" aria-label="Brightness">
+                    <input type="number" id="valBrightness" class="w31-num" value="0" aria-label="Brightness Value">
                 </div>
                 <div class="flex items-center gap-2 mb-1">
-                    <label class="w-8 text-sm">SAT</label>
-                    <input type="range" id="inpSat" min="0" max="200" value="100">
-                    <input type="number" id="valSat" class="w31-num" value="100">
+                    <label for="inpSat" class="w-8 text-sm" title="Saturation">SAT</label>
+                    <input type="range" id="inpSat" min="0" max="200" value="100" aria-label="Saturation">
+                    <input type="number" id="valSat" class="w31-num" value="100" aria-label="Saturation Value">
                 </div>
             </div>
 
@@ -410,14 +410,14 @@
                 <span class="group-label">GPU PROCESS</span>
                 
                 <div class="flex justify-between items-center mb-1 mt-1">
-                    <label class="block text-sm">Palette Mode</label>
+                    <label for="selPalette" class="block text-sm">Palette Mode</label>
                     <label class="flex items-center text-sm cursor-pointer select-none">
                         <input type="checkbox" id="chkRedmean" checked class="w31-checkbox">
                         <span class="text-xs font-bold" title="Better human color perception matching">REDMEAN</span>
                     </label>
                 </div>
 
-                <select id="selPalette" class="mb-2 w-full p-1 text-lg">
+                <select id="selPalette" class="mb-2 w-full p-1 text-lg" aria-label="Palette Mode">
                     <optgroup label="Auto Extraction">
                         <option value="auto8">Auto (8 Colors)</option>
                         <option value="auto16" selected>Auto (16 Colors)</option>
@@ -480,8 +480,8 @@
                 <label class="block mb-1 text-sm font-bold">Dither Mixing</label>
                 <div class="p-2 border border-gray-400 bg-gray-100 mb-2 box-shadow-inner">
                     <div class="mb-1">
-                        <label class="text-xs">Algo A</label>
-                        <select id="selDither" class="text-sm h-7 w-full border border-gray-500">
+                        <label for="selDither" class="text-xs">Algo A</label>
+                        <select id="selDither" class="text-sm h-7 w-full border border-gray-500" aria-label="Dither Algorithm A">
                             <option value="bayer4">Ordered 4x4</option>
                             <option value="bayer2">Ordered 2x2</option>
                             <option value="bayer8" selected>Ordered 8x8</option>
@@ -495,8 +495,8 @@
                         </select>
                     </div>
                     <div class="mb-1">
-                        <label class="text-xs">Algo B</label>
-                        <select id="selDither2" class="text-sm h-7 w-full border border-gray-500">
+                        <label for="selDither2" class="text-xs">Algo B</label>
+                        <select id="selDither2" class="text-sm h-7 w-full border border-gray-500" aria-label="Dither Algorithm B">
                             <option value="none">None</option>
                             <option value="bayer4">Ordered 4x4</option>
                             <option value="bayer2">Ordered 2x2</option>
@@ -511,20 +511,20 @@
                     </div>
                     
                     <div class="flex items-center gap-2 mt-2">
-                        <label class="text-xs w-8">MIX</label>
-                        <input type="range" id="inpDitherMix" min="0" max="100" value="50">
-                        <input type="number" id="valDitherMix" class="w31-num" value="50">
+                        <label for="inpDitherMix" class="text-xs w-8">MIX</label>
+                        <input type="range" id="inpDitherMix" min="0" max="100" value="50" aria-label="Dither Mix">
+                        <input type="number" id="valDitherMix" class="w31-num" value="50" aria-label="Dither Mix Value">
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <label class="w-12 text-sm">AMT</label>
-                    <input type="range" id="inpDitherAmt" min="0" max="100" value="50">
-                    <input type="number" id="valDitherAmt" class="w31-num" value="50">
+                    <label for="inpDitherAmt" class="w-12 text-sm">AMT</label>
+                    <input type="range" id="inpDitherAmt" min="0" max="100" value="50" aria-label="Dither Amount">
+                    <input type="number" id="valDitherAmt" class="w31-num" value="50" aria-label="Dither Amount Value">
                 </div>
             </div>
             
-            <button id="btnCompare" class="bevel-up bevel-btn w-full py-2 font-bold mb-4 bg-yellow-100 text-sm">HOLD TO COMPARE</button>
+            <button id="btnCompare" tabindex="0" class="bevel-up bevel-btn w-full py-2 font-bold mb-4 bg-yellow-100 text-sm" aria-label="Hold to Compare Original Image">HOLD TO COMPARE</button>
 
         </div>
 
@@ -545,460 +545,352 @@
     <!-- Footer -->
     <div class="status-bar bevel-up flex justify-between px-2 py-1 bg-gray-300 border-t-2 border-white">
         <span id="statusMsg">READY.</span>
-        <div>
-            <span id="statusZoom" class="mr-4">100%</span>
+        <div class="flex items-center">
+            <div class="flex items-center gap-1 mr-4">
+                <button id="btnZoomOut" class="bevel-up bevel-btn w-6 h-6 flex items-center justify-center font-bold pb-1" aria-label="Zoom Out">-</button>
+                <span id="statusZoom" class="w-12 text-center">100%</span>
+                <button id="btnZoomIn" class="bevel-up bevel-btn w-6 h-6 flex items-center justify-center font-bold pb-1" aria-label="Zoom In">+</button>
+            </div>
             <span id="statusRes">0 x 0</span>
         </div>
     </div>
 </div>
 
+<script id="worker-code" type="worker-script">
+    const CONSTANTS = {
+        LUMA_R: 0.299,
+        LUMA_G: 0.587,
+        LUMA_B: 0.114,
+        RESOLUTION_STOPS: Array.from({length: 20}, (_, i) => (i + 1) * 32),
+        BAYER4: [[0, 8, 2, 10],[12, 4, 14, 6],[3, 11, 1, 9],[15, 7, 13, 5]],
+        BAYER8: [
+            [ 0, 48, 12, 60,  3, 51, 15, 63],
+            [32, 16, 44, 28, 35, 19, 47, 31],
+            [ 8, 56,  4, 52, 11, 59,  7, 55],
+            [40, 24, 36, 20, 43, 27, 39, 23],
+            [ 2, 50, 14, 62,  1, 49, 13, 61],
+            [34, 18, 46, 30, 33, 17, 45, 29],
+            [10, 58,  6, 54,  9, 57,  5, 53],
+            [42, 26, 38, 22, 41, 25, 37, 21]
+        ]
+    };
+
+    const PALETTES = {
+        'bw': [[0,0,0], [255,255,255]],
+        'gb': [[15,56,15], [48,98,48], [139,172,15], [155,188,15]],
+        'cga1': [[0,0,0], [85,255,255], [255,85,255], [255,255,255]],
+        'cga2': [[0,0,0], [85,255,85], [255,85,85], [255,255,85]],
+        'ega': [
+            [0,0,0],[0,0,170],[0,170,0],[0,170,170],[170,0,0],[170,0,170],[170,85,0],[170,170,170],
+            [85,85,85],[85,85,255],[85,255,85],[85,255,255],[255,85,85],[255,85,255],[255,255,85],[255,255,255]
+        ],
+        'c64': [
+            [0,0,0],[255,255,255],[136,0,0],[170,255,238],[204,68,204],[0,204,85],[0,0,170],[238,238,119],
+            [221,136,85],[102,68,0],[255,119,119],[51,51,51],[119,119,119],[170,255,102],[0,136,255],[187,187,187]
+        ],
+        'nes': [
+            [124,124,124], [0,0,252], [0,0,188], [68,40,188], [148,0,132], [168,0,32], [168,16,0], [136,20,0],
+            [80,48,0], [0,120,0], [0,104,0], [0,88,0], [0,64,88], [0,0,0], [0,0,0], [0,0,0],
+            [188,188,188], [0,120,248], [0,88,248], [104,68,252], [216,0,204], [228,0,88], [248,56,0], [228,92,16],
+            [172,124,0], [0,184,0], [0,168,0], [0,168,68], [0,136,136], [0,0,0], [0,0,0], [0,0,0],
+            [248,248,248], [60,188,252], [104,136,252], [152,120,248], [248,120,248], [248,88,152], [248,120,88], [252,160,68],
+            [248,184,0], [184,248,24], [88,216,84], [88,248,152], [0,232,216], [120,120,120], [0,0,0], [0,0,0],
+            [252,252,252], [164,228,252], [184,184,248], [216,184,248], [248,184,248], [248,164,192], [240,208,176], [252,224,168],
+            [248,216,120], [216,248,120], [184,248,184], [184,248,216], [0,252,252], [248,216,248], [0,0,0], [0,0,0]
+        ],
+        'vapor': [[255,113,206], [1,205,254], [5,255,161], [185,103,255], [255,251,150], [20,20,40], [60,20,60], [255,255,255]],
+        'redscale': [[0,0,0], [50,0,0], [100,0,0], [150,0,0], [200,0,0], [255,0,0]],
+        'matrix': [[0,0,0], [0,50,0], [0,100,0], [0,150,0], [0,200,0], [0,255,0], [200,255,200]]
+    };
+
+    const generateVGA = () => {
+        const p = [
+            [0,0,0], [0,0,170], [0,170,0], [0,170,170], [170,0,0], [170,0,170], [170,85,0], [170,170,170],
+            [85,85,85], [85,85,255], [85,255,85], [85,255,255], [255,85,85], [255,85,255], [255,255,85], [255,255,255]
+        ];
+        for(let i=0; i<16; i++) p.push([Math.floor(i*(255/15)),Math.floor(i*(255/15)),Math.floor(i*(255/15))]);
+        for(let r=0; r<6; r++) for(let g=0; g<6; g++) for(let b=0; b<6; b++) p.push([r*51, g*51, b*51]);
+        return p.slice(0, 256);
+    };
+    PALETTES['vga'] = generateVGA();
+
+    class ColorUtils {
+        static distEuclidean(c1, c2) { return (c1[0]-c2[0])**2 + (c1[1]-c2[1])**2 + (c1[2]-c2[2])**2; }
+        static distRedmean(c1, c2) {
+            let rMean = (c1[0] + c2[0]) / 2;
+            let r = c1[0] - c2[0], g = c1[1] - c2[1], b = c1[2] - c2[2];
+            return (((512+rMean)*r*r)>>8) + 4*g*g + (((767-rMean)*b*b)>>8);
+        }
+        static rgbToHsv(r, g, b) {
+            r/=255, g/=255, b/=255;
+            let max = Math.max(r,g,b), min = Math.min(r,g,b);
+            let h, s, v = max, d = max - min;
+            s = max == 0 ? 0 : d / max;
+            if (max == min) h = 0;
+            else {
+                switch (max) {
+                    case r: h = (g-b)/d+(g<b?6:0); break;
+                    case g: h = (b-r)/d+2; break;
+                    case b: h = (r-g)/d+4; break;
+                }
+                h /= 6;
+            }
+            return [h, s, v];
+        }
+        static hsvToRgb(h, s, v) {
+            let r, g, b, i = Math.floor(h*6), f=h*6-i, p=v*(1-s), q=v*(1-f*s), t=v*(1-(1-f)*s);
+            switch (i%6) {
+                case 0: r=v,g=t,b=p; break; case 1: r=q,g=v,b=p; break; case 2: r=p,g=v,b=t; break;
+                case 3: r=p,g=q,b=v; break; case 4: r=t,g=p,b=v; break; case 5: r=v,g=p,b=q; break;
+            }
+            return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
+        }
+        static rgbToYiq(r, g, b) {
+            return [CONSTANTS.LUMA_R*r + CONSTANTS.LUMA_G*g + CONSTANTS.LUMA_B*b, 0.596*r - 0.274*g - 0.322*b, 0.211*r - 0.523*g - 0.312*b];
+        }
+        static yiqToRgb(y, i, q) {
+            return [Math.max(0,Math.min(255, y+0.956*i+0.621*q)), Math.max(0,Math.min(255, y-0.272*i-0.647*q)), Math.max(0,Math.min(255, y-1.106*i+1.703*q))];
+        }
+        static quantizeVal(val, steps) {
+            if (steps < 2) steps = 2;
+            const stepSize = 255 / (steps - 1);
+            return Math.floor(Math.round(val / stepSize) * stepSize);
+        }
+    }
+
+    const DitherStrategies = {
+        _distribute: (data, idx, w, h, dx, dy, factor, errR, errG, errB) => {
+            const targetIdx = idx + (dy * w + dx) * 4;
+            if(targetIdx < data.length && targetIdx > 0) {
+                data[targetIdx] += errR * factor;
+                data[targetIdx+1] += errG * factor;
+                data[targetIdx+2] += errB * factor;
+            }
+        },
+        'none': () => {},
+        'bayer2': () => {},
+        'bayer4': () => {},
+        'bayer8': () => {},
+        'floyd': (data, idx, w, h, er, eg, eb) => {
+            const d = DitherStrategies._distribute;
+            d(data, idx, w, h, 1, 0, 7/16, er, eg, eb);
+            d(data, idx, w, h, -1, 1, 3/16, er, eg, eb);
+            d(data, idx, w, h, 0, 1, 5/16, er, eg, eb);
+            d(data, idx, w, h, 1, 1, 1/16, er, eg, eb);
+        },
+        'falsefloyd': (data, idx, w, h, er, eg, eb) => {
+            const d = DitherStrategies._distribute;
+            d(data, idx, w, h, 1, 0, 3/8, er, eg, eb);
+            d(data, idx, w, h, 0, 1, 3/8, er, eg, eb);
+            d(data, idx, w, h, 1, 1, 2/8, er, eg, eb);
+        },
+        'atkinson': (data, idx, w, h, er, eg, eb) => {
+            const d = DitherStrategies._distribute;
+            const f = 1/8;
+            d(data, idx, w, h, 1, 0, f, er, eg, eb);
+            d(data, idx, w, h, 2, 0, f, er, eg, eb);
+            d(data, idx, w, h, -1, 1, f, er, eg, eb);
+            d(data, idx, w, h, 0, 1, f, er, eg, eb);
+            d(data, idx, w, h, 1, 1, f, er, eg, eb);
+            d(data, idx, w, h, 0, 2, f, er, eg, eb);
+        },
+        'jjn': (data, idx, w, h, er, eg, eb) => {
+            const d = DitherStrategies._distribute;
+            d(data, idx, w, h, 1, 0, 7/48, er, eg, eb); d(data, idx, w, h, 2, 0, 5/48, er, eg, eb);
+            d(data, idx, w, h, -2, 1, 3/48, er, eg, eb); d(data, idx, w, h, -1, 1, 5/48, er, eg, eb);
+            d(data, idx, w, h, 0, 1, 7/48, er, eg, eb); d(data, idx, w, h, 1, 1, 5/48, er, eg, eb); d(data, idx, w, h, 2, 1, 3/48, er, eg, eb);
+            d(data, idx, w, h, -2, 2, 1/48, er, eg, eb); d(data, idx, w, h, -1, 2, 3/48, er, eg, eb);
+            d(data, idx, w, h, 0, 2, 5/48, er, eg, eb); d(data, idx, w, h, 1, 2, 3/48, er, eg, eb); d(data, idx, w, h, 2, 2, 1/48, er, eg, eb);
+        },
+        'sierra': (data, idx, w, h, er, eg, eb) => {
+            const d = DitherStrategies._distribute;
+            d(data, idx, w, h, 1, 0, 2/4, er, eg, eb); d(data, idx, w, h, -1, 1, 1/4, er, eg, eb); d(data, idx, w, h, 0, 1, 1/4, er, eg, eb);
+        },
+        'stucki': (data, idx, w, h, er, eg, eb) => {
+            const d = DitherStrategies._distribute;
+            const f = 1/42;
+            d(data, idx, w, h, 1,0, 8*f, er, eg, eb); d(data, idx, w, h, 2,0, 4*f, er, eg, eb);
+            d(data, idx, w, h, -2,1, 2*f, er, eg, eb); d(data, idx, w, h, -1,1, 4*f, er, eg, eb); d(data, idx, w, h, 0,1, 8*f, er, eg, eb); d(data, idx, w, h, 1,1, 4*f, er, eg, eb); d(data, idx, w, h, 2,1, 2*f, er, eg, eb);
+            d(data, idx, w, h, -2,2, 1*f, er, eg, eb); d(data, idx, w, h, -1,2, 2*f, er, eg, eb); d(data, idx, w, h, 0,2, 4*f, er, eg, eb); d(data, idx, w, h, 1,2, 2*f, er, eg, eb); d(data, idx, w, h, 2,2, 1*f, er, eg, eb);
+        }
+    };
+
+    class ImageProcessor {
+        constructor() {
+            this.srcBitmap = null;
+            this.width = 0;
+            this.height = 0;
+        }
+
+        loadImage(bitmap) {
+            this.srcBitmap = bitmap;
+            this.width = bitmap.width;
+            this.height = bitmap.height;
+        }
+        
+        findClosest(r, g, b, palette, useRedmean, cache) {
+            const ri = Math.round(r), gi = Math.round(g), bi = Math.round(b);
+            const key = (ri << 16) | (gi << 8) | bi;
+            if (cache.has(key)) return cache.get(key);
+            let minD = Infinity, best = palette[0], target = [r, g, b];
+            for(let i = 0; i < palette.length; i++) {
+                const d = useRedmean ? ColorUtils.distRedmean(target, palette[i]) : ColorUtils.distEuclidean(target, palette[i]);
+                if(d < minD) { minD = d; best = palette[i]; if(d === 0) break; }
+            }
+            cache.set(key, best);
+            return best;
+        }
+
+        async process(options) {
+            const { targetWidth, contrast, brightness, saturation, ditherType1, ditherType2, ditherMix, ditherAmt, paletteId, axis1, axis2, axis3, useRedmean, customPalette } = options;
+
+            if (customPalette) {
+                 PALETTES[paletteId] = customPalette;
+            }
+
+            const scale = targetWidth / this.width;
+            const targetHeight = Math.floor(this.height * scale);
+
+            const workCanvas = new OffscreenCanvas(targetWidth, targetHeight);
+            const ctx = workCanvas.getContext('2d');
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(this.srcBitmap, 0, 0, targetWidth, targetHeight);
+
+            let idata = ctx.getImageData(0, 0, targetWidth, targetHeight);
+            let data = idata.data;
+            const len = data.length;
+            const bVal = brightness;
+            const cFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+            for (let i = 0; i < len; i += 4) {
+                let r = data[i], g = data[i+1], b = data[i+2];
+                r = cFactor * (r - 128) + 128 + bVal;
+                g = cFactor * (g - 128) + 128 + bVal;
+                b = cFactor * (b - 128) + 128 + bVal;
+                if (saturation !== 100) {
+                    const gray = CONSTANTS.LUMA_R * r + CONSTANTS.LUMA_G * g + CONSTANTS.LUMA_B * b;
+                    const sVal = saturation / 100;
+                    r = gray + (r - gray) * sVal;
+                    g = gray + (g - gray) * sVal;
+                    b = gray + (b - gray) * sVal;
+                }
+                data[i] = Math.max(0, Math.min(255, r));
+                data[i+1] = Math.max(0, Math.min(255, g));
+                data[i+2] = Math.max(0, Math.min(255, b));
+            }
+
+            let palette;
+            let isMathMode = paletteId.startsWith('math_');
+            if (!isMathMode) {
+                if (paletteId.startsWith('auto')) {
+                    const count = parseInt(paletteId.replace('auto',''));
+                    if(count === 8) palette = PALETTES.cga1.concat(PALETTES.cga2);
+                    else if(count === 32) palette = PALETTES.vga.slice(0, 32);
+                    else palette = PALETTES.ega;
+                } else { palette = PALETTES[paletteId] || PALETTES.vga; }
+            }
+
+            const dAmt = ditherAmt / 100, mix = ditherMix / 100, w = targetWidth, h = targetHeight;
+            const spatialCache = new Map();
+            const strategy1 = DitherStrategies[ditherType1] || DitherStrategies['none'];
+            const strategy2 = DitherStrategies[ditherType2] || DitherStrategies['none'];
+            const isBayer1 = ditherType1.startsWith('bayer');
+            const isBayer2 = ditherType2.startsWith('bayer');
+
+            const processChunk = function* () {
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        const idx = (y * w + x) * 4;
+                        let r = data[idx], g = data[idx+1], b = data[idx+2];
+                        let offset = 0;
+                        if (isBayer1 || isBayer2) {
+                            const m = (ditherType1 === 'bayer8' || ditherType2 === 'bayer8') ? CONSTANTS.BAYER8 : CONSTANTS.BAYER4;
+                            const dim = m.length;
+                            const th = m[y%dim][x%dim];
+                            const bayVal = ((th / (dim*dim)) - 0.5) * 64;
+                            if(isBayer1 && !isBayer2) offset = bayVal * (1-mix);
+                            else if(!isBayer1 && isBayer2) offset = bayVal * mix;
+                            else offset = bayVal;
+                        }
+                        const dOffset = offset * dAmt;
+                        let dR = r + dOffset, dG = g + dOffset, dB = b + dOffset;
+                        let finalColor;
+
+                        if (isMathMode) {
+                            dR = Math.max(0, Math.min(255, dR)); dG = Math.max(0, Math.min(255, dG)); dB = Math.max(0, Math.min(255, dB));
+                            if (paletteId === 'math_dynamic_xy') {
+                                const qs = axis1, quantBias = (axis2 / 256) * 100;
+                                let rSteps = qs, gSteps = qs, bSteps = Math.max(2, qs / 2);
+                                if (quantBias < 50) { rSteps = Math.max(2, Math.floor(qs * (quantBias/50))); bSteps = Math.max(2, qs - rSteps + 2); }
+                                else { gSteps = Math.max(2, Math.floor(qs * ((100-quantBias)/50))); bSteps = Math.max(2, qs - gSteps + 2); }
+                                finalColor = [ColorUtils.quantizeVal(dR, rSteps), ColorUtils.quantizeVal(dG, gSteps), ColorUtils.quantizeVal(dB, bSteps)];
+                            }
+                            else if (paletteId === 'math_rgb_split') finalColor = [ColorUtils.quantizeVal(dR, axis1), ColorUtils.quantizeVal(dG, axis2), ColorUtils.quantizeVal(dB, axis3)];
+                            else if (paletteId === 'math_luma_chroma') {
+                                const yiq = ColorUtils.rgbToYiq(dR, dG, dB);
+                                let qY = ColorUtils.quantizeVal(yiq[0], axis1);
+                                const qSteps = axis2, stepSize = 300 / qSteps;
+                                let qI = Math.round(yiq[1] / stepSize) * stepSize, qQ = Math.round(yiq[2] / stepSize) * stepSize;
+                                finalColor = ColorUtils.yiqToRgb(qY, qI, qQ);
+                            }
+                            else if (paletteId === 'math_bitcrush') {
+                                 const bright = (dR+dG+dB)/3;
+                                 finalColor = bright < axis2 ? [0,0,0] : [ColorUtils.quantizeVal(dR, axis1), ColorUtils.quantizeVal(dG, axis1), ColorUtils.quantizeVal(dB, axis1)];
+                            }
+                            else if (paletteId === 'math_quant_rgb') finalColor = [ColorUtils.quantizeVal(dR, axis1), ColorUtils.quantizeVal(dG, axis1), ColorUtils.quantizeVal(dB, axis1)];
+                            else if (paletteId === 'math_quant_hsv') {
+                                const hsv = ColorUtils.rgbToHsv(dR, dG, dB);
+                                hsv[0] = Math.floor(hsv[0] * axis1) / axis1; hsv[1] = Math.floor(hsv[1] * axis1) / axis1; hsv[2] = Math.floor(hsv[2] * axis1) / axis1;
+                                finalColor = ColorUtils.hsvToRgb(hsv[0], hsv[1], hsv[2]);
+                            }
+                        } else { finalColor = this.findClosest(dR, dG, dB, palette, useRedmean, spatialCache); }
+
+                        data[idx] = finalColor[0]; data[idx+1] = finalColor[1]; data[idx+2] = finalColor[2];
+                        const er = (r - dOffset - finalColor[0]) * dAmt, eg = (g - dOffset - finalColor[1]) * dAmt, eb = (b - dOffset - finalColor[2]) * dAmt;
+                        if(!isBayer1) strategy1(data, idx, w, h, er, eg, eb, 1 - mix);
+                        if(!isBayer2) strategy2(data, idx, w, h, er, eg, eb, mix);
+                    }
+                    if (y % 10 === 0) yield (y / h);
+                }
+            }.bind(this);
+
+            const iterator = processChunk();
+            const runLoop = () => {
+                const start = performance.now();
+                let res = iterator.next();
+                while(!res.done && performance.now() - start < 12) res = iterator.next();
+                if (res.done) {
+                    self.postMessage({type: 'complete', result: idata}, [idata.data.buffer]);
+                } else {
+                    self.postMessage({type: 'progress', value: res.value});
+                    setTimeout(runLoop, 0); // Use setTimeout in worker for loop
+                }
+            };
+            runLoop();
+        }
+    }
+
+    const processor = new ImageProcessor();
+
+    self.onmessage = async (e) => {
+        const { type, payload } = e.data;
+        if (type === 'loadImage') {
+            processor.loadImage(payload);
+        } else if (type === 'process') {
+            processor.process(payload);
+        }
+    };
+</script>
+
 <script>
 /**
  * RETRO PIXEL LAB v3.2
- * - Editable Slider Values
- * - Zoom Snap (100% Increments) & Status
- * - Zoom Preferences
+ * Refactored to use Web Worker for image processing.
  */
 
-/**
- * Global constants used throughout the application.
- * @constant
- * @type {Object}
- * @property {number} LUMA_R - Red coefficient for luma calculation.
- * @property {number} LUMA_G - Green coefficient for luma calculation.
- * @property {number} LUMA_B - Blue coefficient for luma calculation.
- * @property {number[]} RESOLUTION_STOPS - Pre-calculated resolution stops.
- * @property {number[][]} BAYER4 - 4x4 Bayer matrix for ordered dithering.
- * @property {number[][]} BAYER8 - 8x8 Bayer matrix for ordered dithering.
- */
-const CONSTANTS = {
-    LUMA_R: 0.299,
-    LUMA_G: 0.587,
-    LUMA_B: 0.114,
-    RESOLUTION_STOPS: Array.from({length: 20}, (_, i) => (i + 1) * 32),
-    BAYER4: [[0, 8, 2, 10],[12, 4, 14, 6],[3, 11, 1, 9],[15, 7, 13, 5]],
-    BAYER8: [
-        [ 0, 48, 12, 60,  3, 51, 15, 63],
-        [32, 16, 44, 28, 35, 19, 47, 31],
-        [ 8, 56,  4, 52, 11, 59,  7, 55],
-        [40, 24, 36, 20, 43, 27, 39, 23],
-        [ 2, 50, 14, 62,  1, 49, 13, 61],
-        [34, 18, 46, 30, 33, 17, 45, 29],
-        [10, 58,  6, 54,  9, 57,  5, 53],
-        [42, 26, 38, 22, 41, 25, 37, 21]
-    ]
-};
-
-/**
- * Collection of color palettes.
- * Each palette is an array of RGB arrays [r, g, b].
- * @constant
- * @type {Object.<string, number[][]>}
- */
-const PALETTES = {
-    'bw': [[0,0,0], [255,255,255]],
-    'gb': [[15,56,15], [48,98,48], [139,172,15], [155,188,15]],
-    'cga1': [[0,0,0], [85,255,255], [255,85,255], [255,255,255]],
-    'cga2': [[0,0,0], [85,255,85], [255,85,85], [255,255,85]],
-    'ega': [
-        [0,0,0],[0,0,170],[0,170,0],[0,170,170],[170,0,0],[170,0,170],[170,85,0],[170,170,170],
-        [85,85,85],[85,85,255],[85,255,85],[85,255,255],[255,85,85],[255,85,255],[255,255,85],[255,255,255]
-    ],
-    'c64': [
-        [0,0,0],[255,255,255],[136,0,0],[170,255,238],[204,68,204],[0,204,85],[0,0,170],[238,238,119],
-        [221,136,85],[102,68,0],[255,119,119],[51,51,51],[119,119,119],[170,255,102],[0,136,255],[187,187,187]
-    ],
-    'nes': [
-        [124,124,124], [0,0,252], [0,0,188], [68,40,188], [148,0,132], [168,0,32], [168,16,0], [136,20,0],
-        [80,48,0], [0,120,0], [0,104,0], [0,88,0], [0,64,88], [0,0,0], [0,0,0], [0,0,0],
-        [188,188,188], [0,120,248], [0,88,248], [104,68,252], [216,0,204], [228,0,88], [248,56,0], [228,92,16],
-        [172,124,0], [0,184,0], [0,168,0], [0,168,68], [0,136,136], [0,0,0], [0,0,0], [0,0,0],
-        [248,248,248], [60,188,252], [104,136,252], [152,120,248], [248,120,248], [248,88,152], [248,120,88], [252,160,68],
-        [248,184,0], [184,248,24], [88,216,84], [88,248,152], [0,232,216], [120,120,120], [0,0,0], [0,0,0],
-        [252,252,252], [164,228,252], [184,184,248], [216,184,248], [248,184,248], [248,164,192], [240,208,176], [252,224,168],
-        [248,216,120], [216,248,120], [184,248,184], [184,248,216], [0,252,252], [248,216,248], [0,0,0], [0,0,0]
-    ],
-    'vapor': [[255,113,206], [1,205,254], [5,255,161], [185,103,255], [255,251,150], [20,20,40], [60,20,60], [255,255,255]],
-    'redscale': [[0,0,0], [50,0,0], [100,0,0], [150,0,0], [200,0,0], [255,0,0]],
-    'matrix': [[0,0,0], [0,50,0], [0,100,0], [0,150,0], [0,200,0], [0,255,0], [200,255,200]]
-};
-
-/**
- * Generates the standard VGA 256 color palette.
- * @returns {number[][]} An array of 256 colors, each representing [r, g, b].
- */
-const generateVGA = () => {
-    const p = [
-        [0,0,0], [0,0,170], [0,170,0], [0,170,170], [170,0,0], [170,0,170], [170,85,0], [170,170,170],
-        [85,85,85], [85,85,255], [85,255,85], [85,255,255], [255,85,85], [255,85,255], [255,255,85], [255,255,255]
-    ];
-    for(let i=0; i<16; i++) p.push([Math.floor(i*(255/15)),Math.floor(i*(255/15)),Math.floor(i*(255/15))]);
-    for(let r=0; r<6; r++) for(let g=0; g<6; g++) for(let b=0; b<6; b++) p.push([r*51, g*51, b*51]);
-    return p.slice(0, 256);
-};
-PALETTES['vga'] = generateVGA();
-
-/**
- * Utility class for color calculations and conversions.
- */
-class ColorUtils {
-    /**
-     * Calculates the squared Euclidean distance between two colors.
-     * @param {number[]} c1 - First color [r, g, b].
-     * @param {number[]} c2 - Second color [r, g, b].
-     * @returns {number} The squared distance.
-     */
-    static distEuclidean(c1, c2) { return (c1[0]-c2[0])**2 + (c1[1]-c2[1])**2 + (c1[2]-c2[2])**2; }
-
-    /**
-     * Calculates the Redmean color distance between two colors.
-     * This approximates human color perception better than Euclidean distance.
-     * @param {number[]} c1 - First color [r, g, b].
-     * @param {number[]} c2 - Second color [r, g, b].
-     * @returns {number} The weighted squared distance.
-     */
-    static distRedmean(c1, c2) {
-        let rMean = (c1[0] + c2[0]) / 2;
-        let r = c1[0] - c2[0], g = c1[1] - c2[1], b = c1[2] - c2[2];
-        return (((512+rMean)*r*r)>>8) + 4*g*g + (((767-rMean)*b*b)>>8);
-    }
-
-    /**
-     * Converts RGB color space to HSV.
-     * @param {number} r - Red (0-255).
-     * @param {number} g - Green (0-255).
-     * @param {number} b - Blue (0-255).
-     * @returns {number[]} The HSV representation [h, s, v] where h, s, v are 0-1.
-     */
-    static rgbToHsv(r, g, b) {
-        r/=255, g/=255, b/=255;
-        let max = Math.max(r,g,b), min = Math.min(r,g,b);
-        let h, s, v = max, d = max - min;
-        s = max == 0 ? 0 : d / max;
-        if (max == min) h = 0;
-        else {
-            switch (max) {
-                case r: h = (g-b)/d+(g<b?6:0); break;
-                case g: h = (b-r)/d+2; break;
-                case b: h = (r-g)/d+4; break;
-            }
-            h /= 6;
-        }
-        return [h, s, v];
-    }
-
-    /**
-     * Converts HSV color space to RGB.
-     * @param {number} h - Hue (0-1).
-     * @param {number} s - Saturation (0-1).
-     * @param {number} v - Value (0-1).
-     * @returns {number[]} The RGB representation [r, g, b] (0-255).
-     */
-    static hsvToRgb(h, s, v) {
-        let r, g, b, i = Math.floor(h*6), f=h*6-i, p=v*(1-s), q=v*(1-f*s), t=v*(1-(1-f)*s);
-        switch (i%6) {
-            case 0: r=v,g=t,b=p; break; case 1: r=q,g=v,b=p; break; case 2: r=p,g=v,b=t; break;
-            case 3: r=p,g=q,b=v; break; case 4: r=t,g=p,b=v; break; case 5: r=v,g=p,b=q; break;
-        }
-        return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
-    }
-
-    /**
-     * Converts RGB color space to YIQ.
-     * @param {number} r - Red (0-255).
-     * @param {number} g - Green (0-255).
-     * @param {number} b - Blue (0-255).
-     * @returns {number[]} The YIQ representation [y, i, q].
-     */
-    static rgbToYiq(r, g, b) {
-        return [CONSTANTS.LUMA_R*r + CONSTANTS.LUMA_G*g + CONSTANTS.LUMA_B*b, 0.596*r - 0.274*g - 0.322*b, 0.211*r - 0.523*g - 0.312*b];
-    }
-
-    /**
-     * Converts YIQ color space to RGB.
-     * @param {number} y - Luma component.
-     * @param {number} i - In-phase component.
-     * @param {number} q - Quadrature component.
-     * @returns {number[]} The RGB representation [r, g, b] (0-255).
-     */
-    static yiqToRgb(y, i, q) {
-        return [Math.max(0,Math.min(255, y+0.956*i+0.621*q)), Math.max(0,Math.min(255, y-0.272*i-0.647*q)), Math.max(0,Math.min(255, y-1.106*i+1.703*q))];
-    }
-
-    /**
-     * Quantizes a value into a specific number of steps.
-     * @param {number} val - The value to quantize (0-255).
-     * @param {number} steps - The number of steps/levels.
-     * @returns {number} The quantized value.
-     */
-    static quantizeVal(val, steps) {
-        if (steps < 2) steps = 2;
-        const stepSize = 255 / (steps - 1);
-        return Math.floor(Math.round(val / stepSize) * stepSize);
-    }
-}
-
-/**
- * Collection of dithering strategies (error diffusion and ordered).
- * @namespace
- */
-const DitherStrategies = {
-    /**
-     * Helper to distribute quantization error to neighboring pixels.
-     * @param {Uint8ClampedArray} data - The image pixel data.
-     * @param {number} idx - Current pixel index.
-     * @param {number} w - Image width.
-     * @param {number} h - Image height.
-     * @param {number} dx - X offset for error distribution.
-     * @param {number} dy - Y offset for error distribution.
-     * @param {number} factor - Error distribution factor.
-     * @param {number} errR - Red error component.
-     * @param {number} errG - Green error component.
-     * @param {number} errB - Blue error component.
-     */
-    _distribute: (data, idx, w, h, dx, dy, factor, errR, errG, errB) => {
-        const targetIdx = idx + (dy * w + dx) * 4;
-        if(targetIdx < data.length && targetIdx > 0) {
-            data[targetIdx] += errR * factor;
-            data[targetIdx+1] += errG * factor;
-            data[targetIdx+2] += errB * factor;
-        }
-    },
-    'none': () => {},
-    'bayer2': () => {},
-    'bayer4': () => {},
-    'bayer8': () => {},
-    'floyd': (data, idx, w, h, er, eg, eb) => {
-        const d = DitherStrategies._distribute;
-        d(data, idx, w, h, 1, 0, 7/16, er, eg, eb);
-        d(data, idx, w, h, -1, 1, 3/16, er, eg, eb);
-        d(data, idx, w, h, 0, 1, 5/16, er, eg, eb);
-        d(data, idx, w, h, 1, 1, 1/16, er, eg, eb);
-    },
-    'falsefloyd': (data, idx, w, h, er, eg, eb) => {
-        const d = DitherStrategies._distribute;
-        d(data, idx, w, h, 1, 0, 3/8, er, eg, eb);
-        d(data, idx, w, h, 0, 1, 3/8, er, eg, eb);
-        d(data, idx, w, h, 1, 1, 2/8, er, eg, eb);
-    },
-    'atkinson': (data, idx, w, h, er, eg, eb) => {
-        const d = DitherStrategies._distribute;
-        const f = 1/8;
-        d(data, idx, w, h, 1, 0, f, er, eg, eb);
-        d(data, idx, w, h, 2, 0, f, er, eg, eb);
-        d(data, idx, w, h, -1, 1, f, er, eg, eb);
-        d(data, idx, w, h, 0, 1, f, er, eg, eb);
-        d(data, idx, w, h, 1, 1, f, er, eg, eb);
-        d(data, idx, w, h, 0, 2, f, er, eg, eb);
-    },
-    'jjn': (data, idx, w, h, er, eg, eb) => {
-        const d = DitherStrategies._distribute;
-        d(data, idx, w, h, 1, 0, 7/48, er, eg, eb); d(data, idx, w, h, 2, 0, 5/48, er, eg, eb);
-        d(data, idx, w, h, -2, 1, 3/48, er, eg, eb); d(data, idx, w, h, -1, 1, 5/48, er, eg, eb);
-        d(data, idx, w, h, 0, 1, 7/48, er, eg, eb); d(data, idx, w, h, 1, 1, 5/48, er, eg, eb); d(data, idx, w, h, 2, 1, 3/48, er, eg, eb);
-        d(data, idx, w, h, -2, 2, 1/48, er, eg, eb); d(data, idx, w, h, -1, 2, 3/48, er, eg, eb);
-        d(data, idx, w, h, 0, 2, 5/48, er, eg, eb); d(data, idx, w, h, 1, 2, 3/48, er, eg, eb); d(data, idx, w, h, 2, 2, 1/48, er, eg, eb);
-    },
-    'sierra': (data, idx, w, h, er, eg, eb) => {
-        const d = DitherStrategies._distribute;
-        d(data, idx, w, h, 1, 0, 2/4, er, eg, eb); d(data, idx, w, h, -1, 1, 1/4, er, eg, eb); d(data, idx, w, h, 0, 1, 1/4, er, eg, eb);
-    },
-    'stucki': (data, idx, w, h, er, eg, eb) => {
-        const d = DitherStrategies._distribute;
-        const f = 1/42;
-        d(data, idx, w, h, 1,0, 8*f, er, eg, eb); d(data, idx, w, h, 2,0, 4*f, er, eg, eb);
-        d(data, idx, w, h, -2,1, 2*f, er, eg, eb); d(data, idx, w, h, -1,1, 4*f, er, eg, eb); d(data, idx, w, h, 0,1, 8*f, er, eg, eb); d(data, idx, w, h, 1,1, 4*f, er, eg, eb); d(data, idx, w, h, 2,1, 2*f, er, eg, eb);
-        d(data, idx, w, h, -2,2, 1*f, er, eg, eb); d(data, idx, w, h, -1,2, 2*f, er, eg, eb); d(data, idx, w, h, 0,2, 4*f, er, eg, eb); d(data, idx, w, h, 1,2, 2*f, er, eg, eb); d(data, idx, w, h, 2,2, 1*f, er, eg, eb);
-    }
-};
-
-/**
- * Handles image loading, processing, and pixel manipulation.
- */
-class ImageProcessor {
-    /**
-     * Creates an instance of ImageProcessor.
-     */
-    constructor() {
-        this.srcCanvas = document.createElement('canvas');
-        this.srcCtx = this.srcCanvas.getContext('2d');
-        this.width = 0;
-        this.height = 0;
-    }
-
-    /**
-     * Loads an image into the processor's source canvas.
-     * @param {HTMLImageElement} img - The source image element.
-     */
-    loadImage(img) {
-        this.width = img.width;
-        this.height = img.height;
-        this.srcCanvas.width = this.width;
-        this.srcCanvas.height = this.height;
-        this.srcCtx.drawImage(img, 0, 0);
-    }
-
-    /**
-     * Finds the closest matching color in a palette.
-     * @param {number} r - Red component.
-     * @param {number} g - Green component.
-     * @param {number} b - Blue component.
-     * @param {number[][]} palette - Array of available colors.
-     * @param {boolean} useRedmean - Whether to use Redmean distance (true) or Euclidean (false).
-     * @param {Map} cache - Cache for color lookups.
-     * @returns {number[]} The closest matching color [r, g, b].
-     */
-    findClosest(r, g, b, palette, useRedmean, cache) {
-        const ri = Math.round(r), gi = Math.round(g), bi = Math.round(b);
-        const key = (ri << 16) | (gi << 8) | bi;
-        if (cache.has(key)) return cache.get(key);
-        let minD = Infinity, best = palette[0], target = [r, g, b];
-        for(let i = 0; i < palette.length; i++) {
-            const d = useRedmean ? ColorUtils.distRedmean(target, palette[i]) : ColorUtils.distEuclidean(target, palette[i]);
-            if(d < minD) { minD = d; best = palette[i]; if(d === 0) break; }
-        }
-        cache.set(key, best);
-        return best;
-    }
-
-    /**
-     * Processes the loaded image with the given options.
-     * Uses a generator to allow non-blocking processing (chunking).
-     * @param {Object} options - Processing configuration (resolution, palette, dithering, etc.).
-     * @param {function} onProgress - Callback for progress updates (0-1).
-     * @param {function} onComplete - Callback with the final ImageData.
-     */
-    async process(options, onProgress, onComplete) {
-        const { targetWidth, contrast, brightness, saturation, ditherType1, ditherType2, ditherMix, ditherAmt, paletteId, axis1, axis2, axis3, useRedmean } = options;
-        const scale = targetWidth / this.width;
-        const targetHeight = Math.floor(this.height * scale);
-        
-        const workCanvas = document.createElement('canvas');
-        workCanvas.width = targetWidth;
-        workCanvas.height = targetHeight;
-        const ctx = workCanvas.getContext('2d');
-        
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(this.srcCanvas, 0, 0, targetWidth, targetHeight);
-        
-        let idata = ctx.getImageData(0, 0, targetWidth, targetHeight);
-        let data = idata.data;
-        const len = data.length;
-        const bVal = brightness;
-        const cFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
-        
-        for (let i = 0; i < len; i += 4) {
-            let r = data[i], g = data[i+1], b = data[i+2];
-            r = cFactor * (r - 128) + 128 + bVal;
-            g = cFactor * (g - 128) + 128 + bVal;
-            b = cFactor * (b - 128) + 128 + bVal;
-            if (saturation !== 100) {
-                const gray = CONSTANTS.LUMA_R * r + CONSTANTS.LUMA_G * g + CONSTANTS.LUMA_B * b;
-                const sVal = saturation / 100;
-                r = gray + (r - gray) * sVal;
-                g = gray + (g - gray) * sVal;
-                b = gray + (b - gray) * sVal;
-            }
-            data[i] = Math.max(0, Math.min(255, r));
-            data[i+1] = Math.max(0, Math.min(255, g));
-            data[i+2] = Math.max(0, Math.min(255, b));
-        }
-
-        let palette;
-        let isMathMode = paletteId.startsWith('math_');
-        if (!isMathMode) {
-            if (paletteId.startsWith('auto')) {
-                const count = parseInt(paletteId.replace('auto',''));
-                if(count === 8) palette = PALETTES.cga1.concat(PALETTES.cga2); 
-                else if(count === 32) palette = PALETTES.vga.slice(0, 32); 
-                else palette = PALETTES.ega; 
-            } else { palette = PALETTES[paletteId] || PALETTES.vga; }
-        }
-
-        const dAmt = ditherAmt / 100, mix = ditherMix / 100, w = targetWidth, h = targetHeight;
-        const spatialCache = new Map();
-        const strategy1 = DitherStrategies[ditherType1] || DitherStrategies['none'];
-        const strategy2 = DitherStrategies[ditherType2] || DitherStrategies['none'];
-        const isBayer1 = ditherType1.startsWith('bayer');
-        const isBayer2 = ditherType2.startsWith('bayer');
-
-        const processChunk = function* () {
-            for (let y = 0; y < h; y++) {
-                for (let x = 0; x < w; x++) {
-                    const idx = (y * w + x) * 4;
-                    let r = data[idx], g = data[idx+1], b = data[idx+2];
-                    let offset = 0;
-                    if (isBayer1 || isBayer2) {
-                        const m = (ditherType1 === 'bayer8' || ditherType2 === 'bayer8') ? CONSTANTS.BAYER8 : CONSTANTS.BAYER4;
-                        const dim = m.length;
-                        const th = m[y%dim][x%dim];
-                        const bayVal = ((th / (dim*dim)) - 0.5) * 64;
-                        if(isBayer1 && !isBayer2) offset = bayVal * (1-mix);
-                        else if(!isBayer1 && isBayer2) offset = bayVal * mix;
-                        else offset = bayVal; 
-                    }
-                    const dOffset = offset * dAmt;
-                    let dR = r + dOffset, dG = g + dOffset, dB = b + dOffset;
-                    let finalColor;
-
-                    if (isMathMode) {
-                        dR = Math.max(0, Math.min(255, dR)); dG = Math.max(0, Math.min(255, dG)); dB = Math.max(0, Math.min(255, dB));
-                        if (paletteId === 'math_dynamic_xy') {
-                            const qs = axis1, quantBias = (axis2 / 256) * 100;
-                            let rSteps = qs, gSteps = qs, bSteps = Math.max(2, qs / 2);
-                            if (quantBias < 50) { rSteps = Math.max(2, Math.floor(qs * (quantBias/50))); bSteps = Math.max(2, qs - rSteps + 2); } 
-                            else { gSteps = Math.max(2, Math.floor(qs * ((100-quantBias)/50))); bSteps = Math.max(2, qs - gSteps + 2); }
-                            finalColor = [ColorUtils.quantizeVal(dR, rSteps), ColorUtils.quantizeVal(dG, gSteps), ColorUtils.quantizeVal(dB, bSteps)];
-                        }
-                        else if (paletteId === 'math_rgb_split') finalColor = [ColorUtils.quantizeVal(dR, axis1), ColorUtils.quantizeVal(dG, axis2), ColorUtils.quantizeVal(dB, axis3)];
-                        else if (paletteId === 'math_luma_chroma') {
-                            const yiq = ColorUtils.rgbToYiq(dR, dG, dB);
-                            let qY = ColorUtils.quantizeVal(yiq[0], axis1);
-                            const qSteps = axis2, stepSize = 300 / qSteps;
-                            let qI = Math.round(yiq[1] / stepSize) * stepSize, qQ = Math.round(yiq[2] / stepSize) * stepSize;
-                            finalColor = ColorUtils.yiqToRgb(qY, qI, qQ);
-                        }
-                        else if (paletteId === 'math_bitcrush') {
-                             const bright = (dR+dG+dB)/3;
-                             finalColor = bright < axis2 ? [0,0,0] : [ColorUtils.quantizeVal(dR, axis1), ColorUtils.quantizeVal(dG, axis1), ColorUtils.quantizeVal(dB, axis1)];
-                        }
-                        else if (paletteId === 'math_quant_rgb') finalColor = [ColorUtils.quantizeVal(dR, axis1), ColorUtils.quantizeVal(dG, axis1), ColorUtils.quantizeVal(dB, axis1)];
-                        else if (paletteId === 'math_quant_hsv') {
-                            const hsv = ColorUtils.rgbToHsv(dR, dG, dB);
-                            hsv[0] = Math.floor(hsv[0] * axis1) / axis1; hsv[1] = Math.floor(hsv[1] * axis1) / axis1; hsv[2] = Math.floor(hsv[2] * axis1) / axis1;
-                            finalColor = ColorUtils.hsvToRgb(hsv[0], hsv[1], hsv[2]);
-                        } 
-                    } else { finalColor = this.findClosest(dR, dG, dB, palette, useRedmean, spatialCache); }
-
-                    data[idx] = finalColor[0]; data[idx+1] = finalColor[1]; data[idx+2] = finalColor[2];
-                    const er = (r - dOffset - finalColor[0]) * dAmt, eg = (g - dOffset - finalColor[1]) * dAmt, eb = (b - dOffset - finalColor[2]) * dAmt;
-                    if(!isBayer1) strategy1(data, idx, w, h, er, eg, eb, 1 - mix);
-                    if(!isBayer2) strategy2(data, idx, w, h, er, eg, eb, mix);
-                }
-                if (y % 10 === 0) yield (y / h);
-            }
-        }.bind(this);
-
-        const iterator = processChunk();
-        const runLoop = () => {
-            const start = performance.now();
-            let res = iterator.next();
-            while(!res.done && performance.now() - start < 12) res = iterator.next();
-            if (res.done) onComplete(idata);
-            else { onProgress(res.value); requestAnimationFrame(runLoop); }
-        };
-        runLoop();
-    }
-}
-
-/**
- * Manages DOM elements and UI interactions.
- */
 class UIManager {
-    /**
-     * Initializes the UI manager and caches DOM element references.
-     */
     constructor() {
         this.els = {
             mainCanvas: document.getElementById('mainCanvas'),
@@ -1028,6 +920,8 @@ class UIManager {
             lblAxis3: document.getElementById('lblAxis3'),
             selPalette: document.getElementById('selPalette'),
             btnCompare: document.getElementById('btnCompare'),
+            btnZoomIn: document.getElementById('btnZoomIn'),
+            btnZoomOut: document.getElementById('btnZoomOut'),
             menuBtnFile: document.getElementById('menuBtnFile'),
             dropdownFile: document.getElementById('dropdownFile'),
             menuBtnPref: document.getElementById('menuBtnPref'),
@@ -1056,18 +950,12 @@ class UIManager {
     }
 }
 
-/**
- * Main application class connecting UI and ImageProcessor.
- */
 class App {
-    /**
-     * Initializes the application, state, and listeners.
-     */
     constructor() {
         this.ui = new UIManager();
-        this.processor = new ImageProcessor();
         this.ctx = this.ui.els.mainCanvas.getContext('2d');
         
+        // Define Palette Config here only for UI reference, logic is in Worker
         this.PALETTE_CONFIG = {
             'math_dynamic_xy': { labels: ['Steps', 'Bias (R/G)'], types: ['step', 'linear'], show: [true, true, false] },
             'math_rgb_split': { labels: ['R Steps', 'G Steps', 'B Steps'], types: ['step', 'step', 'step'], show: [true, true, true] },
@@ -1096,6 +984,7 @@ class App {
             useRedmean: true
         };
 
+        this.customPalettes = {};
         this.history = [];
         this.historyIndex = -1;
 
@@ -1103,44 +992,29 @@ class App {
         this.processedData = null;
         this.isProcessing = false;
 
+        this.initWorker();
         this.initListeners();
         this.initDefaultImage();
     }
 
-    /**
-     * Calculates the step value from a slider position (exponential curve).
-     * @param {number} val - Slider value (0-100).
-     * @returns {number} The calculated step value (2-256).
-     */
+    initWorker() {
+        const blob = new Blob([document.getElementById('worker-code').textContent], {type: 'text/javascript'});
+        this.worker = new Worker(window.URL.createObjectURL(blob));
+        this.worker.onmessage = (e) => {
+             const { type, value, result } = e.data;
+             if (type === 'progress') {
+                 // Could update a progress bar here
+             } else if (type === 'complete') {
+                 this.onProcessComplete(result);
+             }
+        };
+    }
+
     getStepFromSlider(val) { if(val<=0) return 2; return Math.round(2 + 254 * Math.pow(val / 100, 3)); }
-
-    /**
-     * Calculates the slider position from a step value (inverse exponential).
-     * @param {number} val - Step value (2-256).
-     * @returns {number} The calculated slider value (0-100).
-     */
     getSliderFromStep(val) { if(val<=2) return 0; return Math.pow((val - 2) / 254, 1/3) * 100; }
-
-    /**
-     * Converts a slider value (0-100) to a linear byte value (0-255).
-     * @param {number} val - Slider value.
-     * @returns {number} Byte value (0-255).
-     */
     getLinearFromSlider(val) { return Math.round((val / 100) * 255); }
-
-    /**
-     * Converts a linear byte value (0-255) to a slider value (0-100).
-     * @param {number} val - Byte value.
-     * @returns {number} Slider value.
-     */
     getSliderFromLinear(val) { return (val / 255) * 100; }
 
-    /**
-     * Updates the axis values in the state based on slider or number input.
-     * Handles synchronization between slider and number box.
-     * @param {string} idx - The axis index ('1', '2', or '3').
-     * @param {string} source - The source of change ('slider' or 'number').
-     */
     updateAxisValue(idx, source) {
         const slider = this.ui.els[`inpAxis${idx}`];
         const number = this.ui.els[`numAxis${idx}`];
@@ -1162,9 +1036,6 @@ class App {
         this.debounceProcess();
     }
 
-    /**
-     * Updates the UI state (visibility of axes) based on selected palette mode.
-     */
     updateUIState() {
         const config = this.PALETTE_CONFIG[this.state.palette] || this.PALETTE_CONFIG['default'];
         const show = config.show || [false, false, false];
@@ -1183,7 +1054,6 @@ class App {
 
     saveHistory() {
         if (this.isRestoringHistory) return;
-        // If we are not at the end of history, discard future
         if (this.historyIndex < this.history.length - 1) {
             this.history = this.history.slice(0, this.historyIndex + 1);
         }
@@ -1282,9 +1152,6 @@ class App {
         }
     }
 
-    /**
-     * Initializes the default startup image.
-     */
     initDefaultImage() {
         const img = new Image();
         img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNiAAAABgADNjd8qAAAAABJRU5ErkJggg==";
@@ -1307,25 +1174,21 @@ class App {
             const finalImg = new Image();
             finalImg.onload = () => {
                 this.originalSrc = finalImg;
-                this.processor.loadImage(finalImg);
-                this.triggerProcess();
-                this.saveHistory();
+                createImageBitmap(finalImg).then(bmp => {
+                    this.worker.postMessage({type: 'loadImage', payload: bmp}, [bmp]);
+                    this.triggerProcess();
+                    this.saveHistory();
+                });
             };
             finalImg.src = cvs.toDataURL();
         };
     }
 
-    /**
-     * Initializes all event listeners for UI controls.
-     */
     initListeners() {
-        // Universal Bind for Slider <-> Input synchronization
         const bind = (id, key) => {
             const slider = document.getElementById(id);
             const number = document.getElementById(id.replace('inp', 'val'));
-            
             if(!slider) return;
-
             slider.addEventListener('input', (e) => {
                 const v = parseInt(e.target.value);
                 this.state[key] = v;
@@ -1333,24 +1196,19 @@ class App {
                 this.debounceProcess();
             });
             slider.addEventListener('change', () => this.saveHistory());
-
             if(number) {
                 number.addEventListener('input', (e) => {
                     let v = parseInt(e.target.value);
                     if(isNaN(v)) return;
-                    // Clamp
                     const min = parseInt(slider.min);
                     const max = parseInt(slider.max);
                     v = Math.max(min, Math.min(max, v));
-                    
                     this.state[key] = v;
                     slider.value = v;
                     this.debounceProcess();
                 });
                 number.addEventListener('blur', () => {
-                    if (number.value === '' || isNaN(parseInt(number.value))) {
-                        number.value = this.state[key];
-                    }
+                    if (number.value === '' || isNaN(parseInt(number.value))) number.value = this.state[key];
                 });
                 number.addEventListener('change', () => this.saveHistory());
             }
@@ -1358,7 +1216,6 @@ class App {
 
         const { inpRes, valRes, chkSnap, menuBtnFile, dropdownFile, menuBtnPref, dropdownPref, menuBtnEdit, dropdownEdit } = this.ui.els;
 
-        // Menu Logic
         const closeMenus = () => {
             dropdownFile.classList.remove('show');
             dropdownPref.classList.remove('show');
@@ -1373,13 +1230,11 @@ class App {
 
         document.addEventListener('click', closeMenus);
 
-        // Keyboard Shortcuts
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); this.undo(); }
             if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); this.redo(); }
         });
 
-        // Paste support
         document.addEventListener('paste', (e) => {
             if (e.clipboardData && e.clipboardData.items) {
                 for (let i = 0; i < e.clipboardData.items.length; i++) {
@@ -1397,9 +1252,8 @@ class App {
         this.ui.els.menuLoad.addEventListener('click', () => this.ui.els.fileInput.click());
         this.ui.els.menuSave.addEventListener('click', () => this.saveImage());
         
-        // Zoom Snap Toggle
         this.ui.els.menuZoomSnap.addEventListener('click', (e) => {
-            e.stopPropagation(); // Keep menu open? Or close. Let's close.
+            e.stopPropagation();
             this.state.zoomSnap = !this.state.zoomSnap;
             this.ui.els.checkZoomSnap.innerText = this.state.zoomSnap ? '✓' : '';
         });
@@ -1413,7 +1267,6 @@ class App {
             });
         });
 
-        // Resolution Special Case (Snap vs Text Input)
         inpRes.addEventListener('input', (e) => {
             let val = parseInt(e.target.value);
             this.state.width = val;
@@ -1424,8 +1277,6 @@ class App {
         valRes.addEventListener('input', (e) => {
              let val = parseInt(e.target.value);
              if(isNaN(val)) return;
-             // Snap logic check? If typing manually, maybe don't force snap until blur?
-             // For now direct mapping
              this.state.width = val;
              inpRes.value = val;
              this.debounceProcess();
@@ -1452,7 +1303,6 @@ class App {
         bind('inpDitherMix', 'ditherMix');
         bind('inpDitherAmt', 'ditherAmt');
         
-        // Bind Selects
         const simpleBind = (id, key) => {
             const el = document.getElementById(id);
             el.addEventListener('change', (e) => {
@@ -1466,7 +1316,7 @@ class App {
 
         this.ui.els.selPalette.addEventListener('change', (e) => {
             if (e.target.value === 'import_custom') {
-                e.target.value = this.state.palette; // Revert selection
+                e.target.value = this.state.palette;
                 this.ui.els.paletteInput.click();
                 return;
             }
@@ -1531,14 +1381,41 @@ class App {
         btnCompare.addEventListener('touchstart', (e) => { e.preventDefault(); showOriginal(); });
         btnCompare.addEventListener('touchend', (e) => { e.preventDefault(); showProcessed(); });
 
+        // Keyboard interaction for Compare
+        btnCompare.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                showOriginal();
+            }
+        });
+        btnCompare.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                showProcessed();
+            }
+        });
+
+        // Zoom Buttons
+        this.ui.els.btnZoomIn.addEventListener('click', () => this.adjustZoom(1));
+        this.ui.els.btnZoomOut.addEventListener('click', () => this.adjustZoom(-1));
+
         this.setupViewportInteraction();
         this.updateUIState();
     }
 
-    /**
-     * Parses and loads a custom palette from a file (.hex or image).
-     * @param {File} file
-     */
+    adjustZoom(direction) {
+        if (this.state.zoomSnap) {
+            let newZoom = Math.round(this.state.zoom + direction);
+            newZoom = Math.max(1, newZoom);
+            this.state.zoom = newZoom;
+        } else {
+            const factor = direction > 0 ? 1.2 : 0.8;
+            this.state.zoom *= factor;
+        }
+        this.updateTransform();
+        this.updateZoomStatus();
+    }
+
     handlePaletteFile(file) {
         if (file.name.toLowerCase().endsWith('.hex') || file.name.toLowerCase().endsWith('.txt')) {
             const reader = new FileReader();
@@ -1549,7 +1426,6 @@ class App {
                 for (let line of lines) {
                     line = line.trim();
                     if (!line || line.startsWith(';') || line.startsWith('//')) continue;
-                    // match hex: #RRGGBB or RRGGBB
                     const match = line.match(/^#?([0-9A-Fa-f]{6})$/);
                     if (match) {
                         const hex = match[1];
@@ -1578,17 +1454,16 @@ class App {
                      const data = ctx.getImageData(0,0,img.width,img.height).data;
                      const colorSet = new Set();
                      const colors = [];
-                     // Limit scanning to avoid freezing, target ~100k samples max
                      const step = Math.max(1, Math.floor((img.width * img.height) / 100000));
 
                      for(let i=0; i<data.length; i+=4*step) {
-                         if(data[i+3] < 128) continue; // transparent
+                         if(data[i+3] < 128) continue;
                          const r = data[i], g = data[i+1], b = data[i+2];
                          const key = `${r},${g},${b}`;
                          if(!colorSet.has(key)) {
                              colorSet.add(key);
                              colors.push([r,g,b]);
-                             if(colors.length >= 256) break; // Limit to 256
+                             if(colors.length >= 256) break;
                          }
                      }
 
@@ -1606,14 +1481,13 @@ class App {
 
     addCustomPalette(name, colors) {
         const id = 'custom_' + Date.now();
-        PALETTES[id] = colors;
+        this.customPalettes[id] = colors; // Store locally to pass to worker
 
         const select = this.ui.els.selPalette;
         let customGroup = select.querySelector('optgroup[label="Custom"]');
         if (!customGroup) {
             customGroup = document.createElement('optgroup');
             customGroup.label = "Custom";
-            // Insert before "Actions"
             const actions = select.querySelector('optgroup[label="Actions"]');
             if (actions) select.insertBefore(customGroup, actions);
             else select.appendChild(customGroup);
@@ -1632,10 +1506,6 @@ class App {
         this.saveHistory();
     }
 
-    /**
-     * Handles file input change (drag/drop or menu).
-     * @param {File} file - The uploaded file.
-     */
     handleFile(file) {
         if (!file || !file.type.startsWith('image/')) return;
         const reader = new FileReader();
@@ -1643,20 +1513,19 @@ class App {
             const img = new Image();
             img.onload = () => {
                 this.originalSrc = img;
-                this.processor.loadImage(img);
-                this.state.zoom = 1; this.state.panX = 0; this.state.panY = 0;
-                this.updateTransform();
-                this.updateZoomStatus();
-                this.triggerProcess();
+                createImageBitmap(img).then(bmp => {
+                    this.worker.postMessage({type: 'loadImage', payload: bmp}, [bmp]);
+                    this.state.zoom = 1; this.state.panX = 0; this.state.panY = 0;
+                    this.updateTransform();
+                    this.updateZoomStatus();
+                    this.triggerProcess();
+                });
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
 
-    /**
-     * Sets up mouse and touch interactions for the viewport (pan and zoom).
-     */
     setupViewportInteraction() {
         const container = this.ui.els.viewport;
         let isDragging = false;
@@ -1665,13 +1534,11 @@ class App {
             e.preventDefault();
             
             if (this.state.zoomSnap) {
-                // Snap mode: +/- 100% (1.0)
                 const direction = e.deltaY > 0 ? -1 : 1;
                 let newZoom = Math.round(this.state.zoom + direction);
-                newZoom = Math.max(1, newZoom); // Minimum 100%
+                newZoom = Math.max(1, newZoom);
                 this.state.zoom = newZoom;
             } else {
-                // Fluid mode
                 this.state.zoom *= (e.deltaY > 0 ? 0.9 : 1.1);
             }
             
@@ -1691,32 +1558,19 @@ class App {
         container.addEventListener('touchend', () => isDragging = false);
     }
 
-    /**
-     * Updates the CSS transform of the canvas based on zoom and pan state.
-     */
     updateTransform() {
         this.ui.els.canvasWrapper.style.transform = `translate(${this.state.panX}px, ${this.state.panY}px) scale(${this.state.zoom})`;
     }
     
-    /**
-     * Updates the zoom percentage display in the status bar.
-     */
     updateZoomStatus() {
         this.ui.els.statusZoom.innerText = `${Math.round(this.state.zoom * 100)}%`;
     }
 
-    /**
-     * Debounces the image processing to prevent excessive re-renders during slider dragging.
-     */
     debounceProcess() {
         if (this.debounceTimer) clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => this.triggerProcess(), 200);
     }
 
-    /**
-     * Triggers the image processing pipeline with the current state.
-     * Manages loading states and UI updates.
-     */
     triggerProcess() {
         if (!this.originalSrc || this.isProcessing) return;
         this.isProcessing = true;
@@ -1725,25 +1579,24 @@ class App {
         const options = {
             ...this.state,
             targetWidth: this.state.width,
-            paletteId: this.state.palette
+            paletteId: this.state.palette,
+            customPalette: this.customPalettes[this.state.palette]
         };
 
-        this.processor.process(options, () => {}, (imgData) => {
-            this.processedData = imgData;
-            this.ui.els.mainCanvas.width = imgData.width;
-            this.ui.els.mainCanvas.height = imgData.height;
-            this.ctx.putImageData(imgData, 0, 0);
-            this.ui.els.statusMsg.innerText = "DONE.";
-            this.ui.els.statusRes.innerText = `${imgData.width} x ${imgData.height}`;
-            this.ui.els.loadingOverlay.classList.add('hidden');
-            this.isProcessing = false;
-        });
+        this.worker.postMessage({type: 'process', payload: options});
     }
 
-    /**
-     * Saves the processed image to the user's computer.
-     * Upscales the image if an export scale factor is set.
-     */
+    onProcessComplete(imgData) {
+        this.processedData = imgData;
+        this.ui.els.mainCanvas.width = imgData.width;
+        this.ui.els.mainCanvas.height = imgData.height;
+        this.ctx.putImageData(imgData, 0, 0);
+        this.ui.els.statusMsg.innerText = "DONE.";
+        this.ui.els.statusRes.innerText = `${imgData.width} x ${imgData.height}`;
+        this.ui.els.loadingOverlay.classList.add('hidden');
+        this.isProcessing = false;
+    }
+
     saveImage() {
         if(!this.processedData) return;
         const exportCvs = document.createElement('canvas');
