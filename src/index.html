@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RETRO PIXEL LAB v3.2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+
+<div class="main-window bevel-up">
+    <!-- Title Bar -->
+    <div class="title-bar">
+        <span>RETRO PIXEL LAB v3.2</span>
+        <div class="flex gap-1">
+            <button class="bevel-up bevel-btn px-2 font-bold text-black border-none bg-gray-300">_</button>
+            <button class="bevel-up bevel-btn px-2 font-bold text-black border-none bg-gray-300">X</button>
+        </div>
+    </div>
+
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+        <div class="menu-item" id="menuBtnFile">
+            <u>F</u>ile
+            <div class="dropdown" id="dropdownFile">
+                <div class="dropdown-item" id="menuLoad">Load Image...</div>
+                <div class="dropdown-separator"></div>
+                <div class="dropdown-item" id="menuSave">Save to Disk</div>
+            </div>
+        </div>
+        <div class="menu-item" id="menuBtnEdit">
+            <u>E</u>dit
+            <div class="dropdown" id="dropdownEdit">
+                <div class="dropdown-item" id="menuUndo"><span>Undo</span> <span class="text-xs text-gray-500">Ctrl+Z</span></div>
+                <div class="dropdown-item" id="menuRedo"><span>Redo</span> <span class="text-xs text-gray-500">Ctrl+Y</span></div>
+            </div>
+        </div>
+        <div class="menu-item" id="menuBtnPref">
+            <u>P</u>references
+            <div class="dropdown" id="dropdownPref">
+                <div class="dropdown-item disabled font-bold bg-gray-200" style="cursor:default">Export Scale</div>
+                <div class="dropdown-separator"></div>
+                <div class="dropdown-item scale-opt" data-scale="1"><span>1x (Original)</span> <span id="check-scale-1">✓</span></div>
+                <div class="dropdown-item scale-opt" data-scale="2"><span>2x</span> <span id="check-scale-2"></span></div>
+                <div class="dropdown-item scale-opt" data-scale="4"><span>4x</span> <span id="check-scale-4"></span></div>
+                <div class="dropdown-item scale-opt" data-scale="8"><span>8x</span> <span id="check-scale-8"></span></div>
+                <div class="dropdown-separator"></div>
+                <div class="dropdown-item" id="menuZoomSnap"><span>Snap Zoom (100%)</span> <span id="check-zoom-snap">✓</span></div>
+            </div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" class="hidden">
+        <input type="file" id="paletteInput" accept=".hex,.txt,image/*" class="hidden">
+    </div>
+
+    <!-- Main Content -->
+    <div class="app-body">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+
+            <!-- Horizontal Scale (Editable) -->
+            <div class="group-box bevel-down">
+                <span class="group-label">HORIZONTAL SCALE</span>
+                <div class="flex flex-col gap-1 mt-1">
+                    <div class="flex justify-between items-end px-1">
+                         <div class="flex items-center gap-1">
+                             <input type="number" id="valRes" class="w31-num w-16" value="160">
+                             <span class="text-sm">px</span>
+                         </div>
+                         <label class="flex items-center text-sm cursor-pointer select-none">
+                            <input type="checkbox" id="chkSnap" checked class="w31-checkbox">
+                            <span>SNAP 32px</span>
+                        </label>
+                    </div>
+                    <input type="range" id="inpRes" min="32" max="640" step="32" value="160" class="w-full">
+                </div>
+            </div>
+
+            <!-- Color Adjust (Editable) -->
+            <div class="group-box bevel-down">
+                <span class="group-label">COLOR ADJUST</span>
+                <div class="flex items-center gap-2 mb-1 mt-1">
+                    <label class="w-8 text-sm">CON</label>
+                    <input type="range" id="inpContrast" min="-100" max="100" value="0">
+                    <input type="number" id="valContrast" class="w31-num" value="0">
+                </div>
+                <div class="flex items-center gap-2 mb-1">
+                    <label class="w-8 text-sm">BRI</label>
+                    <input type="range" id="inpBrightness" min="-100" max="100" value="0">
+                    <input type="number" id="valBrightness" class="w31-num" value="0">
+                </div>
+                <div class="flex items-center gap-2 mb-1">
+                    <label class="w-8 text-sm">SAT</label>
+                    <input type="range" id="inpSat" min="0" max="200" value="100">
+                    <input type="number" id="valSat" class="w31-num" value="100">
+                </div>
+            </div>
+
+            <!-- Palette & Dither -->
+            <div class="group-box bevel-down">
+                <span class="group-label">GPU PROCESS</span>
+
+                <div class="flex justify-between items-center mb-1 mt-1">
+                    <label class="block text-sm">Palette Mode</label>
+                    <label class="flex items-center text-sm cursor-pointer select-none">
+                        <input type="checkbox" id="chkRedmean" checked class="w31-checkbox">
+                        <span class="text-xs font-bold" title="Better human color perception matching">REDMEAN</span>
+                    </label>
+                </div>
+
+                <select id="selPalette" class="mb-2 w-full p-1 text-lg">
+                    <optgroup label="Auto Extraction">
+                        <option value="auto8">Auto (8 Colors)</option>
+                        <option value="auto16" selected>Auto (16 Colors)</option>
+                        <option value="auto32">Auto (32 Colors)</option>
+                    </optgroup>
+                    <optgroup label="Procedural Math">
+                        <option value="math_dynamic_xy">Math: Dynamic XY (Dual Axis)</option>
+                        <option value="math_rgb_split">Math: RGB Split (Tri Axis)</option>
+                        <option value="math_luma_chroma">Math: Luma/Chroma (Dual Axis)</option>
+                        <option value="math_bitcrush">Math: Bitcrush (Dual Axis)</option>
+                        <option value="math_quant_rgb">RGB Quant (Uniform)</option>
+                        <option value="math_quant_hsv">HSV Quant (Uniform)</option>
+                    </optgroup>
+                    <optgroup label="Retro Hardware">
+                        <option value="bw">1-Bit Macintosh</option>
+                        <option value="gb">Gameboy (4 Greens)</option>
+                        <option value="cga1">CGA (Cyan/Mag)</option>
+                        <option value="cga2">CGA (Red/Grn)</option>
+                        <option value="c64">Commodore 64</option>
+                        <option value="nes">NES (Famicom)</option>
+                        <option value="ega">EGA (16 Colors)</option>
+                        <option value="vga">VGA (256 Colors)</option>
+                    </optgroup>
+                    <optgroup label="Artistic">
+                        <option value="vapor">Vaporwave</option>
+                        <option value="matrix">Matrix Code</option>
+                        <option value="redscale">Virtual Boy</option>
+                    </optgroup>
+                    <optgroup label="Actions">
+                        <option value="import_custom" class="font-bold text-blue-800">Load Custom...</option>
+                    </optgroup>
+                </select>
+
+                <!-- Dynamic Math Controls (Already had inputs, refined) -->
+                <div id="mathControls">
+                    <div class="mb-1 hidden" id="wrapAxis1">
+                        <label class="text-sm block" id="lblAxis1">Axis 1</label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="inpAxis1" min="0" max="100" value="30">
+                            <input type="number" id="numAxis1" value="8" class="w31-num">
+                        </div>
+                    </div>
+                    <div class="mb-1 hidden" id="wrapAxis2">
+                        <label class="text-sm block" id="lblAxis2">Axis 2</label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="inpAxis2" min="0" max="100" value="50">
+                            <input type="number" id="numAxis2" value="50" class="w31-num">
+                        </div>
+                    </div>
+                    <div class="mb-3 hidden" id="wrapAxis3">
+                        <label class="text-sm block" id="lblAxis3">Axis 3</label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="inpAxis3" min="0" max="100" value="30">
+                            <input type="number" id="numAxis3" value="8" class="w31-num">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dither Mixing (Added Inputs) -->
+                <label class="block mb-1 text-sm font-bold">Dither Mixing</label>
+                <div class="p-2 border border-gray-400 bg-gray-100 mb-2 box-shadow-inner">
+                    <div class="mb-1">
+                        <label class="text-xs">Algo A</label>
+                        <select id="selDither" class="text-sm h-7 w-full border border-gray-500">
+                            <option value="blue_noise">Blue Noise (64x64)</option>
+                            <option value="bayer4">Ordered 4x4</option>
+                            <option value="bayer2">Ordered 2x2</option>
+                            <option value="bayer8" selected>Ordered 8x8</option>
+                            <option value="floyd">Floyd-Steinberg</option>
+                            <option value="falsefloyd">False Floyd-Steinberg</option>
+                            <option value="atkinson">Atkinson</option>
+                            <option value="jjn">Jarvis, Judice & Ninke</option>
+                            <option value="sierra">Sierra Lite</option>
+                            <option value="stucki">Stucki</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <label class="text-xs">Algo B</label>
+                        <select id="selDither2" class="text-sm h-7 w-full border border-gray-500">
+                            <option value="none">None</option>
+                            <option value="blue_noise">Blue Noise (64x64)</option>
+                            <option value="bayer4">Ordered 4x4</option>
+                            <option value="bayer2">Ordered 2x2</option>
+                            <option value="bayer8">Ordered 8x8</option>
+                            <option value="floyd">Floyd-Steinberg</option>
+                            <option value="falsefloyd">False Floyd-Steinberg</option>
+                            <option value="atkinson">Atkinson</option>
+                            <option value="jjn" selected>Jarvis, Judice & Ninke</option>
+                            <option value="sierra">Sierra Lite</option>
+                            <option value="stucki">Stucki</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2 mt-2">
+                        <label class="text-xs w-8">MIX</label>
+                        <input type="range" id="inpDitherMix" min="0" max="100" value="50">
+                        <input type="number" id="valDitherMix" class="w31-num" value="50">
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <label class="w-12 text-sm">AMT</label>
+                    <input type="range" id="inpDitherAmt" min="0" max="100" value="50">
+                    <input type="number" id="valDitherAmt" class="w31-num" value="50">
+                </div>
+            </div>
+
+            <button id="btnCompare" class="bevel-up bevel-btn w-full py-2 font-bold mb-4 bg-yellow-100 text-sm">HOLD TO COMPARE</button>
+
+        </div>
+
+        <!-- Viewport -->
+        <div class="viewport-container checker-bg bevel-down" id="viewport">
+            <div class="absolute top-2 right-2 flex flex-col gap-2 z-50">
+                <button id="btnZoomIn" class="bevel-up bevel-btn w-8 h-8 font-bold text-lg bg-gray-200" title="Zoom In">+</button>
+                <button id="btnZoomOut" class="bevel-up bevel-btn w-8 h-8 font-bold text-lg bg-gray-200" title="Zoom Out">-</button>
+            </div>
+            <div id="canvasWrapper">
+                <canvas id="mainCanvas"></canvas>
+            </div>
+            <div id="dragOverlay" class="overlay-msg hidden"><span>DROP IMAGE HERE</span></div>
+            <div id="loadingOverlay" class="overlay-msg hidden">
+                <span class="animate-pulse">PROCESSING...</span>
+                <span class="text-sm mt-2">PLEASE WAIT</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="status-bar bevel-up flex justify-between px-2 py-1 bg-gray-300 border-t-2 border-white">
+        <span id="statusMsg">READY.</span>
+        <div>
+            <span id="statusZoom" class="mr-4">100%</span>
+            <span id="statusRes">0 x 0</span>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
