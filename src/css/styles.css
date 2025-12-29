@@ -1,0 +1,306 @@
+        /* --- THEME CONSTANTS --- */
+        :root {
+            --bg-teal: #008080;
+            --win-gray: #c0c0c0;
+            --win-light: #ffffff;
+            --win-dark: #808080;
+            --win-black: #000000;
+            --win-blue: #000080;
+            --font-main: 'VT323', monospace;
+        }
+
+        /* --- GLOBAL LAYOUT --- */
+        body {
+            background-color: var(--bg-teal);
+            font-family: var(--font-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        /* --- RETRO UI KIT --- */
+        .bevel-up {
+            border-top: 2px solid var(--win-light);
+            border-left: 2px solid var(--win-light);
+            border-right: 2px solid var(--win-black);
+            border-bottom: 2px solid var(--win-black);
+            background: var(--win-gray);
+        }
+
+        .bevel-down {
+            border-top: 2px solid var(--win-dark);
+            border-left: 2px solid var(--win-dark);
+            border-right: 2px solid var(--win-light);
+            border-bottom: 2px solid var(--win-light);
+            background: #fff;
+        }
+
+        .bevel-btn {
+            cursor: pointer;
+            border-top: 2px solid var(--win-light);
+            border-left: 2px solid var(--win-light);
+            border-right: 2px solid var(--win-black);
+            border-bottom: 2px solid var(--win-black);
+            background: var(--win-gray);
+            transition: transform 0.05s;
+        }
+        .bevel-btn:active {
+            border-top: 2px solid var(--win-black);
+            border-left: 2px solid var(--win-black);
+            border-right: 2px solid var(--win-light);
+            border-bottom: 2px solid var(--win-light);
+            transform: translate(1px, 1px);
+        }
+
+        /* Windows 3.1 Checkbox Style */
+        .w31-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-top: 2px solid var(--win-dark);
+            border-left: 2px solid var(--win-dark);
+            border-bottom: 2px solid var(--win-light);
+            border-right: 2px solid var(--win-light);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 4px;
+            position: relative;
+        }
+        .w31-checkbox:checked::after {
+            content: 'x';
+            font-family: sans-serif;
+            font-size: 14px;
+            line-height: 10px;
+            color: black;
+            font-weight: bold;
+            position: absolute;
+            top: -1px;
+            left: 1px;
+        }
+
+        /* Windows 3.1 Number Input Style */
+        .w31-num {
+            font-family: var(--font-main);
+            border-top: 2px solid var(--win-dark);
+            border-left: 2px solid var(--win-dark);
+            border-right: 2px solid var(--win-light);
+            border-bottom: 2px solid var(--win-light);
+            background: #fff;
+            padding: 0 2px;
+            text-align: right;
+            width: 48px;
+            height: 24px;
+            font-size: 1.1rem;
+        }
+        .w31-num:focus { outline: none; background: #eee; }
+
+        /* --- COMPONENT STYLES --- */
+        .main-window {
+            width: 98vw;
+            height: 96vh;
+            max-width: 1400px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+            z-index: 10;
+            border: 1px solid var(--win-light);
+            outline: 1px solid var(--win-black);
+        }
+
+        .title-bar {
+            background: var(--win-blue);
+            color: white;
+            padding: 2px 8px;
+            font-size: 1.3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        /* --- MENU BAR --- */
+        .menu-bar {
+            display: flex;
+            background: var(--win-gray);
+            border-bottom: 1px solid var(--win-black);
+            padding-left: 2px;
+        }
+
+        .menu-item {
+            padding: 2px 8px;
+            cursor: pointer;
+            position: relative;
+            font-size: 1.2rem;
+        }
+
+        .menu-item:hover {
+            background: var(--win-blue);
+            color: white;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--win-gray);
+            border: 2px solid var(--win-light);
+            border-right-color: var(--win-black);
+            border-bottom-color: var(--win-black);
+            min-width: 180px;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            color: black;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+        }
+
+        .dropdown.show { display: flex; }
+
+        .dropdown-item {
+            padding: 4px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .dropdown-item:hover {
+            background: var(--win-blue);
+            color: white;
+        }
+
+        .dropdown-separator {
+            height: 1px;
+            background: var(--win-dark);
+            margin: 2px;
+            border-bottom: 1px solid var(--win-light);
+        }
+
+        .app-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .sidebar {
+            width: 280px;
+            min-width: 280px;
+            overflow-y: auto;
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .group-box {
+            border: 1px solid var(--win-dark);
+            padding: 8px;
+            position: relative;
+            margin-top: 8px;
+            box-shadow: -1px -1px 0 var(--win-light), 1px 1px 0 var(--win-white);
+        }
+
+        .group-label {
+            position: absolute;
+            top: -10px;
+            left: 8px;
+            background: var(--win-gray);
+            padding: 0 4px;
+            color: #000;
+        }
+
+        /* Form Inputs */
+        input[type="range"] {
+            flex: 1;
+            height: 20px;
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 4px;
+            background: var(--win-black);
+            border-right: 1px solid white;
+            border-bottom: 1px solid white;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 10px;
+            background: var(--win-gray);
+            border: 2px solid;
+            border-color: white black black white;
+            margin-top: -8px;
+            cursor: pointer;
+        }
+
+        select {
+            font-family: var(--font-main);
+            border: 2px solid var(--win-dark);
+            border-right-color: white;
+            border-bottom-color: white;
+            background: #fff;
+            box-shadow: inset 2px 2px 0 #000;
+        }
+
+        /* Canvas & Viewport */
+        .viewport-container {
+            flex: 1;
+            position: relative;
+            background: #2a2a2a;
+            overflow: hidden;
+            border: 2px solid var(--win-dark);
+            border-color: var(--win-dark) white white var(--win-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+        }
+        .viewport-container:active { cursor: grabbing; }
+
+        .checker-bg {
+            background-image:
+                linear-gradient(45deg, #333 25%, transparent 25%),
+                linear-gradient(-45deg, #333 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #333 75%),
+                linear-gradient(-45deg, transparent 75%, #333 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transform-origin: center;
+        }
+
+        .overlay-msg {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,128, 0.7);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            font-size: 2rem;
+            text-shadow: 2px 2px #000;
+            backdrop-filter: blur(2px);
+            pointer-events: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .app-body { flex-direction: column-reverse; }
+            .sidebar { width: 100%; height: 250px; flex: none; border-top: 2px solid black;}
+        }

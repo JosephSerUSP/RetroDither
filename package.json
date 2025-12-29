@@ -1,0 +1,35 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "Retro Pixel Lab is a browser-based image processing tool designed to apply retro-style effects to images. It runs entirely in your web browser, allowing you to manipulate images with dithering, color palette limitations, and resolution scaling to mimic vintage computer graphics and gaming consoles.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JosephSerUSP/RetroDither.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JosephSerUSP/RetroDither/issues"
+  },
+  "homepage": "https://github.com/JosephSerUSP/RetroDither#readme",
+  "devDependencies": {
+    "vite": "^7.3.0"
+  },
+  "dependencies": {
+    "esbuild": "^0.27.2",
+    "fdir": "^6.5.0",
+    "nanoid": "^3.3.11",
+    "picocolors": "^1.1.1",
+    "picomatch": "^4.0.3",
+    "postcss": "^8.5.6",
+    "rollup": "^4.54.0",
+    "source-map-js": "^1.2.1",
+    "tinyglobby": "^0.2.15"
+  }
+}
