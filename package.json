@@ -1,0 +1,14 @@
+{
+  "name": "retro-pixel-lab",
+  "version": "3.2.0",
+  "description": "Retro Pixel Lab is a browser-based image processing tool.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "type": "module"
+}
