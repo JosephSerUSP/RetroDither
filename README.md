@@ -13,7 +13,7 @@ Retro Pixel Lab is a browser-based image processing tool designed to apply retro
     -   **Procedural Math**: Use mathematical models (RGB Split, Bitcrush, Luma/Chroma) for dynamic color reduction.
     -   **Redmean Color Matching**: Toggle between Euclidean and Redmean color distance algorithms for better human perception matching.
 -   **Dithering Engine**:
-    -   **Algorithms**: Includes Ordered (Bayer), Floyd-Steinberg, Atkinson, Jarvis Judice & Ninke, Sierra Lite, and Stucki.
+    -   **Algorithms**: Includes Ordered (Bayer), Blue Noise, Floyd-Steinberg, Atkinson, Jarvis Judice & Ninke, Sierra Lite, and Stucki.
     -   **Mixing**: Blend two different dithering algorithms together.
     -   **Control**: Adjust dither amount and mix ratio.
 -   **Viewport**:
@@ -24,32 +24,19 @@ Retro Pixel Lab is a browser-based image processing tool designed to apply retro
 
 ## Setup
 
-Retro Pixel Lab is a single-file application. No build process, server, or installation is required.
+Retro Pixel Lab uses native ES Modules. No build process is strictly required for development, but a local server is needed to handle module imports correctly due to CORS.
 
-1.  Download the `index.html` file.
-2.  Open `index.html` in any modern web browser (Chrome, Firefox, Edge, Safari).
+1.  Clone the repository.
+2.  Run a local server in the root directory.
+    -   Python: `python3 -m http.server`
+    -   Node: `npx http-server`
+3.  Open `http://localhost:8000/index.html` in your browser.
 
-## Usage
+## Architecture
 
-### 1. Load an Image
--   Click **File > Load Image...** or simply **Drag & Drop** an image file onto the viewport.
--   A default sample image is loaded on startup.
+The project is structured as follows:
+-   `index.html`: Main entry point.
+-   `src/js/`: JavaScript modules (`App`, `ImageProcessor`, `worker`, etc.).
+-   `src/css/`: Stylesheets.
 
-### 2. Adjust Settings
-Use the sidebar on the left to tweak the effect:
--   **Horizontal Scale**: Slide to change the pixel width. Use the **Snap** checkbox to lock to standard increments.
--   **Color Adjust**: Fine-tune contrast, brightness, and saturation.
--   **GPU Process**:
-    -   Select a **Palette Mode** (Auto, Math, or Retro Hardware).
-    -   If a "Math" mode is selected, additional sliders (Axis 1/2/3) will appear to control parameters like bit-depth or quantization steps.
-    -   **Dither Mixing**: Select two algorithms (Algo A and Algo B) and use the **Mix** slider to blend them.
-    -   **Amt**: Controls the intensity of the error diffusion/dithering.
-
-### 3. Inspect
--   **Zoom**: Scroll the mouse wheel to zoom in/out. Toggle **Snap Zoom** in the **Preferences** menu for integer scaling (100%, 200%, etc.).
--   **Pan**: Click and drag on the viewport to move around.
--   **Compare**: Click and hold the **Hold to Compare** button to peek at the original image.
-
-### 4. Save
--   Go to **Preferences** to select your desired **Export Scale** (e.g., 4x for a crisp pixel-art look on high-res screens).
--   Click **File > Save to Disk** to download the processed image.
+Image processing is offloaded to a Web Worker (`src/js/worker.js`) to ensure UI responsiveness.
